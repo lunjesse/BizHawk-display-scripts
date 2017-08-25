@@ -1,6 +1,6 @@
 memory.usememorydomain("IWRAM")
 
---[[
+--[[NPC layout
 Example for the below:
 41F2 - EID
 41F3 - ELV
@@ -163,10 +163,16 @@ Player_X = 0x4CF8,
 Player_Y = 0x4CFC,
 Money = 0x4CF4,
 Boss = 0x2888,
-Move = 0x2B06,
 Story = 0x4DD7,
 Music = 0x4AE2,	--Seems like it's the background music ID; can use this to check if in battle
-Counter = 0x0840
+Counter = 0x0840,
+Battle_State = 0x2C16,
+Miss = 0x2C14,
+Crit = 0x2C22,
+Move = 0x2B06,
+Damage = 0x2A0B,
+RNG1 = 0x5E08,
+RNG2 = 0x5E10
 }
 
 --Addresses I'm interested regarding power version
@@ -178,10 +184,16 @@ Player_X = 0x4D08,
 Player_Y = 0x4D0C,
 Money = 0x4D04,
 Boss = 0x2898,
-Move = 0x2B16,
 Story = 0x4DE7,
 Music = 0x4AF2,
-Counter = 0x0850
+Counter = 0x0850,
+Battle_State = 0x2C26,
+Miss = 0x2C24,
+Crit = 0x2C32,
+Move = 0x2B16,
+Damage = 0x2A1B,
+RNG1 = 0x5E18,
+RNG2 = 0x5E20
 }
 
 local Enemy_data = {
@@ -210,10 +222,17 @@ local NPC = {x,y,xcam,ycam,state}
 local num = 0	--For NPC
 	while version() ~= "NA" do
 		Addresses = (version() == "Power" and Power or Speed)
-		gui.text(0,55,"BOSS: "..memory.readbyte(Addresses.Boss).." State: "..memory.readbyte(Addresses.State).."Story:"..memory.readbyte(Addresses.Story))
+		gui.text(0,55,"BOSS: "..memory.readbyte(Addresses.Boss).." State: "..memory.readbyte(Addresses.State).." Counter: "..memory.read_u32_le(Addresses.Counter))
+		gui.text(0,220,"5E08: "..memory.read_u32_le(Addresses.RNG1).." 5E10: "..memory.read_u32_le(Addresses.RNG2))
 		gui.text(0,250,"("..string.format('%.6f',memory.read_u32_le(Addresses.Player_X)/65536.0)..","..string.format('%.6f',memory.read_u32_le(Addresses.Player_Y)/65536.0)..")")
 		gui.text(0,265,"$: "..memory.read_u32_le(Addresses.Money))
-		gui.text(0,280,"Move: "..Attacks[memory.readbyte(Addresses.Move)].." ("..memory.readbyte(Addresses.Move)..")")
+		
+	--Just in case something happens that causes a non-move value to appear (healing for instance)
+		if Attacks[memory.readbyte(Addresses.Move)] ~= nil then
+			gui.text(0,280,"Move: "..Attacks[memory.readbyte(Addresses.Move)].." ("..memory.readbyte(Addresses.Move)..")")
+		else
+			gui.text(0,280,"Move: UNDEFINED ("..memory.readbyte(Addresses.Move)..")")
+		end
 		
 	--Just in case something happens that causes map to go above 170
 		if Map[memory.readbyte(Addresses.Map)] ~= nil then
