@@ -1,0 +1,13 @@
+A number of games appear to use similar techniques on dynamically moving address to locate said addresses. Information can be found here: http://tasvideos.org/forum/viewtopic.php?t=18056. For the sake of convinience, here's a list of games I know of that does this:
+
+DS
+Over the Hedge
+
+GBA
+Drake & Josh (For x/y positions only; Not for the "caught" meter - that uses different trick)
+Harry Potter: Prisoner of Azkaban
+Monster House
+Sabre Wulf
+Scooby-Doo! - Mystery Mayhem
+
+All of them uses the same trick, so you can easily reuse the copy from the scripts for those games to apply it on others.
