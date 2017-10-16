@@ -1,29 +1,13 @@
 memory.usememorydomain("IWRAM")
 
 --[[
-Example for the below:
-41F2 - EID
-41F3 - ELV
-41F4 - EHP(Current)
-41F5 - EHP(Max)
-41F6 - EDP
-41F7 - ESPD
-41F8 - EATK
-41F9 - EDEF
-41FA - ESPEC
-41FC - Nature
-41FD - FD
-4207 - 1st move
-4209 - 1st move power
-4210 - 2nd move
-4211 - 2nd move power
-4218 - 3rd move
-4219 - 3rd move power
-4220 - 4th move
-4221 - 4th move power
-4228 - next denjuu's turn
+This script creates a text file that displays the following:
+* Which frame will the move miss
+* Which frame will the move land a critical hit, and how much damage
+* Which frame will the Denjuu's partner/ally appear
+* Which frame will the enemy choose which move
+This is for assisting making a TAS, and is completely useless in normal play
 ]]--
-
 --Check if power or speed version; they have addresses in different places
 function version()
 	if memory.read_u32_le(0x0000A8,"ROM") == 0x574F5032 then
