@@ -8,6 +8,7 @@ This script creates a text file that displays the following:
 * Which frame will the enemy choose which move
 This is for assisting making a TAS, and is completely useless in normal play
 ]]--
+
 --Check if power or speed version; they have addresses in different places
 function version()
 	if memory.read_u32_le(0x0000A8,"ROM") == 0x574F5032 then
@@ -18,7 +19,6 @@ function version()
 		return "NA"
 	end
 end
-
 
 local Picture_Book = {
 [0] = 15,[1] = 16,[2] = 17,[3] = 176,[4] = 177,[5] = 18,[6] = 19,[7] = 20,[8] = 21,[9] = 22,
@@ -88,23 +88,8 @@ local Denjuu = {
 [180] = "Rex (Basic)",[181] = "Rex (Natural-1)",[182] = "Rex (Desert)",[183] = "Rex (Forest)",[184] = "Rex (Natural-2)",[185] = "Doon (Basic)",[186] = "Doon (Natural-1)",[187] = "Doon (Sky)",[188] = "Doon (Aquatic)",[189] = "Doon (Natural-2)",
 [190] = "Gyuun (Basic)",[191] = "Gyuun (Natural-1)",[192] = "Gyuun (Aquatic)",[193] = "Gyuun (Forest)",[194] = "Gyuun (Natural-2)",[195] = "Diablos (Basic)",[196] = "Diablos (Natural-1)",[197] = "Diablos (Mountain)",[198] = "Diablos (Grassland)",[199] = "Diablos (Natural-2)"}
 
---Names for the states that matter
-local BattleStates = {
-[5] = "Damage/Crit determination",
-[36] = "Move used determination",
-[63] = "hit/miss determiniation"
-}
-
 --Addresses I'm interested regarding speed version
 local Speed = {
-Enemy = {0x41F2,0x422A,0x4262},
-State = 0x042C,
-Map = 0x4F90,
-Player_X = 0x4CF8,
-Player_Y = 0x4CFC,
-Money = 0x4CF4,
-Boss = 0x2888,
-Story = 0x4DD7,
 Music = 0x4AE2,	--Seems like it's the background music ID; can use this to check if in battle
 Counter = 0x0840,
 Battle_State = 0x2C16,
@@ -118,14 +103,6 @@ RNG2 = 0x5E10
 
 --Addresses I'm interested regarding power version
 local Power = {
-Enemy = {0x4202,0x423A,0x4272},
-State = 0x043C,
-Map = 0x4FA0,
-Player_X = 0x4D08,
-Player_Y = 0x4D0C,
-Money = 0x4D04,
-Boss = 0x2898,
-Story = 0x4DE7,
 Music = 0x4AF2,
 Counter = 0x0850,
 Battle_State = 0x2C26,
@@ -137,33 +114,16 @@ RNG1 = 0x5E18,
 RNG2 = 0x5E20
 }
 
-local Enemy_data = {
-Level,
-HP_Max,
-HP_Now,
-DP,
-Speed,
-Attack,
-Defence,
-Special,
-Nature,
-FD,
-Friend,
-Attack1,
-Attack2,
-Attack3,
-Attack4,
-Next
-}
 local framelimit = 500
---[[Since its determined as 
+--[[
+Since its determined as 
 "Move used" followed by
 "Miss/Hit" followed by 
-"Damage/Crit"
-in that order, all separately, it makes more sense to have a toggle rather than record all 3
-Toggle parameters are Crit, Moves or Miss
+"Damage/Crit" followed by
+"Ally"
+in that order, all separately, it makes more sense to have a toggle rather than record all 4
+Toggle parameters are Crit, Moves, Miss, or Ally
 ]]--
-
 local toggle = {[5]="Crit",[36]="Moves",[63]="Miss",[31]="Ally"}
 --In Hex, the above is 0x5, 0x24, 0x3F, 0x1F respectively
 while true do
