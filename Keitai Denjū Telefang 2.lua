@@ -11,9 +11,11 @@ Example for the below:
 41F8 - EATK
 41F9 - EDEF
 41FA - ESPEC
+41FB - ???
 41FC - Nature
 41FD - FD
-4207 - 1st move
+4207 - Friend
+4208 - 1st move
 4209 - 1st move power
 4210 - 2nd move
 4211 - 2nd move power
@@ -27,7 +29,7 @@ Example for the below:
 local Map = {}
 --Because some of the maps have values all over the place
 function assign_multi(string,...)
-	for i, v in ipairs(arg) do
+	for i, v in ipairs({...}) do
 		Map[v] = string
 	end
 end
@@ -154,6 +156,7 @@ local Denjuu = {
 [170] = "Gymzyrus (T2)",[171] = "Gymzatan (T2)",[172] = "Angios (T2)",[173] = "Angigorgo (T2)",[174] = "Angipower (T2)",[175] = "Angioros (T2)",[176] = "Fungus (T2)",[177] = "Fungwar (T2)",[178] = "Funboost (T2)",[179] = "Funblade (T2)",
 [180] = "Rex (Basic)",[181] = "Rex (Natural-1)",[182] = "Rex (Desert)",[183] = "Rex (Forest)",[184] = "Rex (Natural-2)",[185] = "Doon (Basic)",[186] = "Doon (Natural-1)",[187] = "Doon (Sky)",[188] = "Doon (Aquatic)",[189] = "Doon (Natural-2)",
 [190] = "Gyuun (Basic)",[191] = "Gyuun (Natural-1)",[192] = "Gyuun (Aquatic)",[193] = "Gyuun (Forest)",[194] = "Gyuun (Natural-2)",[195] = "Diablos (Basic)",[196] = "Diablos (Natural-1)",[197] = "Diablos (Mountain)",[198] = "Diablos (Grassland)",[199] = "Diablos (Natural-2)"}
+
 --Addresses I'm interested regarding speed version
 local Speed = {
 Enemy = {0x41F2,0x422A,0x4262},
@@ -215,10 +218,12 @@ Attack4,
 Next
 }
 
+
 while true do
 local Addresses
-local toggle = 0
+local toggle = 1
 local NPC = {x,y,xcam,ycam,state}
+local Enemy_data_table = {Enemy1,Enemy2,Enemy3}
 local num = 0	--For NPC
 	while version() ~= "NA" do
 		Addresses = (version() == "Power" and Power or Speed)
@@ -254,9 +259,11 @@ local num = 0	--For NPC
 			else
 			end
 			
+			
+			
 			if toggle > 0 and toggle < 4 and memory.readbyte(Addresses.Enemy[toggle]+1) > 0 then
 				--gui.drawText(0,30,"E"..toggle..Denjuu[memory.readbyte(Addresses.Enemy[toggle])].."("..memory.readbyte(Addresses.Enemy[toggle])..")".."&"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
-				gui.drawText(0,30,"E"..toggle.." ID:"..memory.readbyte(Addresses.Enemy[toggle]).." Friend:"..memory.readbyte(Addresses.Enemy[toggle]+21),null,null,10,null,null)
+				gui.drawText(0,30,"E"..toggle.." ID:"..memory.readbyte(Addresses.Enemy[toggle]).." Friend:"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
 				gui.drawText(0,40,"LV:"..memory.readbyte(Addresses.Enemy[toggle]+1).." HP:"..memory.readbyte(Addresses.Enemy[toggle]+2).."/"..memory.readbyte(Addresses.Enemy[toggle]+3).." DP:"..memory.readbyte(Addresses.Enemy[toggle]+4).." ",null,null,10,null,null)
 				gui.drawText(0,50,"SPD:"..memory.readbyte(Addresses.Enemy[toggle]+5).." ATK:"..memory.readbyte(Addresses.Enemy[toggle]+6).." DEF:"..memory.readbyte(Addresses.Enemy[toggle]+7).." SPEC:"..memory.readbyte(Addresses.Enemy[toggle]+8).." ",null,null,10,null,null)
 				gui.drawText(0,60,Attacks[memory.readbyte(Addresses.Enemy[toggle]+22)].." | "..Attacks[memory.readbyte(Addresses.Enemy[toggle]+30)].." ",null,null,10,null,null)
@@ -271,8 +278,8 @@ local num = 0	--For NPC
 					end
 				end
 			end
+			gui.text(0,295,"Battle State:"..memory.readbyte(Addresses.Battle_State).." DMG "..memory.readbyte(Addresses.Damage).."("..memory.readbyte(Addresses.Crit)..")")
 		end
-		
 	--Checking if overworld music is playing to display npc data
 		if memory.readbyte(Addresses.Music) >= 17 and memory.readbyte(Addresses.Music) <= 43 then
 			for i = (version() == "Power" and 0x34E0 or 0x34D0), 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
