@@ -169,6 +169,7 @@ Boss = 0x2888,
 Story = 0x4DD7,
 Music = 0x4AE2,	--Seems like it's the background music ID; can use this to check if in battle
 Counter = 0x0840,
+Battle_Event_Timer = 0x2BA0,
 Battle_State = 0x2C16,
 Miss = 0x2C14,
 Crit = 0x2C22,
@@ -190,6 +191,7 @@ Boss = 0x2898,
 Story = 0x4DE7,
 Music = 0x4AF2,
 Counter = 0x0850,
+Battle_Event_Timer = 0x2BB0,
 Battle_State = 0x2C26,
 Miss = 0x2C24,
 Crit = 0x2C32,
@@ -227,22 +229,8 @@ local Enemy_data_table = {Enemy1,Enemy2,Enemy3}
 local num = 0	--For NPC
 	while version() ~= "NA" do
 		Addresses = (version() == "Power" and Power or Speed)
-		gui.text(0,55,"BOSS: "..memory.readbyte(Addresses.Boss).." State: "..memory.readbyte(Addresses.State).." Counter: "..memory.read_u32_le(Addresses.Counter))
-		gui.text(0,220,"5E08: "..memory.read_u32_le(Addresses.RNG1).." 5E10: "..memory.read_u32_le(Addresses.RNG2))
-		gui.text(0,250,"("..string.format('%.6f',memory.read_u32_le(Addresses.Player_X)/65536.0)..","..string.format('%.6f',memory.read_u32_le(Addresses.Player_Y)/65536.0)..")")
-		gui.text(0,265,"$: "..memory.read_u32_le(Addresses.Money))
-		
-	--Just in case something happens that causes a non-move value to appear (healing for instance)
-		if Attacks[memory.readbyte(Addresses.Move)] ~= nil then
-			gui.text(0,280,"Move: "..Attacks[memory.readbyte(Addresses.Move)].." ("..memory.readbyte(Addresses.Move)..")")
-		else
-			gui.text(0,280,"Move: UNDEFINED ("..memory.readbyte(Addresses.Move)..")")
-		end
-		
-	--Just in case something happens that causes map to go above 170
-		if Map[memory.readbyte(Addresses.Map)] ~= nil then
-			gui.text(0,235,Map[memory.readbyte(Addresses.Map)].."("..memory.readbyte(Addresses.Map)..")")
-		end
+		gui.text(0,0,"RNG: "..memory.read_u32_le(Addresses.RNG1).." Counter: "..memory.read_u32_le(Addresses.Counter).." $: "..memory.read_u32_le(Addresses.Money))
+
 		--Checking if in battle
 		if (memory.readbyte(Addresses.Music) >= 5 and memory.readbyte(Addresses.Music) <= 9) then
 			gui.drawText(0,150,"Denjuu X 1 2 3 A ",null,null,10,null,null) --Click these for info
@@ -258,9 +246,7 @@ local num = 0	--For NPC
 				toggle =  4
 			else
 			end
-			
-			
-			
+	--Draw opponent stats
 			if toggle > 0 and toggle < 4 and memory.readbyte(Addresses.Enemy[toggle]+1) > 0 then
 				--gui.drawText(0,30,"E"..toggle..Denjuu[memory.readbyte(Addresses.Enemy[toggle])].."("..memory.readbyte(Addresses.Enemy[toggle])..")".."&"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
 				gui.drawText(0,30,"E"..toggle.." ID:"..memory.readbyte(Addresses.Enemy[toggle]).." Friend:"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
@@ -269,7 +255,7 @@ local num = 0	--For NPC
 				gui.drawText(0,60,Attacks[memory.readbyte(Addresses.Enemy[toggle]+22)].." | "..Attacks[memory.readbyte(Addresses.Enemy[toggle]+30)].." ",null,null,10,null,null)
 				gui.drawText(0,70,Attacks[memory.readbyte(Addresses.Enemy[toggle]+38)].." | "..Attacks[memory.readbyte(Addresses.Enemy[toggle]+46)].." ",null,null,10,null,null)
 			end
-			
+	--Display only states, without moves		
 			if toggle == 4 then
 				for i=1,3 do
 					if memory.readbyte(Addresses.Enemy[i]+1) > 0 then	--Since id can be 0, check if level is greater than 0 instead. Also make sure it only appears during battle
@@ -278,7 +264,16 @@ local num = 0	--For NPC
 					end
 				end
 			end
-			gui.text(0,295,"Battle State:"..memory.readbyte(Addresses.Battle_State).." DMG "..memory.readbyte(Addresses.Damage).."("..memory.readbyte(Addresses.Crit)..")")
+	--Other things to display during a battle
+			gui.text(0,235,"Battle State:"..memory.readbyte(Addresses.Battle_State).." DMG "..memory.readbyte(Addresses.Damage).."("..memory.readbyte(Addresses.Crit)..")")
+			gui.text(0,250,"Battle timer:"..memory.readbyte(Addresses.Battle_Event_Timer))
+				--Just in case something happens that causes a non-move value to appear (healing for instance)
+		if Attacks[memory.readbyte(Addresses.Move)] ~= nil then
+			gui.text(0,265,"Move: "..Attacks[memory.readbyte(Addresses.Move)].." ("..memory.readbyte(Addresses.Move)..")")
+		else
+			gui.text(0,265,"Move: UNDEFINED ("..memory.readbyte(Addresses.Move)..")")
+		end
+			gui.text(0,280,"BOSS: "..memory.readbyte(Addresses.Boss).." State: "..memory.readbyte(Addresses.State))
 		end
 	--Checking if overworld music is playing to display npc data
 		if memory.readbyte(Addresses.Music) >= 17 and memory.readbyte(Addresses.Music) <= 43 then
@@ -294,7 +289,14 @@ local num = 0	--For NPC
 					gui.drawText(NPC.xcam-5,NPC.ycam-20,num,null,null,10,null,null)
 				end
 			end
+	--Things to display outside battle
 		gui.text(0,295,"NPCs: "..num.." Counter: "..memory.read_u32_le(Addresses.Counter))
+			--Just in case something happens that causes map to go above 170
+		if Map[memory.readbyte(Addresses.Map)] ~= nil then
+			gui.text(0,235,Map[memory.readbyte(Addresses.Map)].."("..memory.readbyte(Addresses.Map)..")")
+		end
+		gui.text(0,250,"("..string.format('%.6f',memory.read_u32_le(Addresses.Player_X)/65536.0)..","..string.format('%.6f',memory.read_u32_le(Addresses.Player_Y)/65536.0)..")")
+		
 		end
 		
 	emu.frameadvance()
