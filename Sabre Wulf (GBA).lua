@@ -41,7 +41,7 @@ local area = {[0] =
 {name = "Stinky Cavern", story = false, silver = 2400, bronze = 4200, c_gold = 960, c_silver = 1500, c_bronze = 2100},
 {name = "Mining Mayhem", story = false, silver = 2100, bronze = 3780, c_gold = 1020, c_silver = 1500, c_bronze = 2100}, 
 {name = "Lookout Ledge", story = false, silver = 2400, bronze = 4200, c_gold = 1380, c_silver = 1800, c_bronze = 2400}, 
-{name = "Crumble Crevice", story = false, silver = 2400, bronze = 4200, c_gold = 1200, c_silver = 1500, c_bronze = }, 
+{name = "Crumble Crevice", story = false, silver = 2400, bronze = 4200, c_gold = 1200, c_silver = 1500, c_bronze = 2100}, 
 {name = "Stranglehold Swamp", story = false, silver = 1800, bronze = 3300, c_gold = 720, c_silver = 1620, c_bronze = 2220}, 
 {name = "Underwurlde Laboratory", story = true, silver = 0, bronze = 0, c_gold = 0, c_silver = 0, c_bronze = 0}, 
 
@@ -56,10 +56,10 @@ local area = {[0] =
 
 {name = "Snowy Knoll", story = false, silver = 2400, bronze = 4200, c_gold = 1170, c_silver = 1560, c_bronze = 2160},
 {name = "Frosty's Grotto", story = true, silver = 3300, bronze = 5580, c_gold = 2100, c_silver = 2700, c_bronze = 3300},
-{name = "Shivery Peaks", story = true, silver = 2100, bronze = 3780, c_gold = 1140,, c_silver = 1500, c_bronze = 2100},
+{name = "Shivery Peaks", story = true, silver = 2100, bronze = 3780, c_gold = 1140, c_silver = 1500, c_bronze = 2100},
 {name = "Wafty Shaft", story = false, silver = 3000, bronze = 5100, c_gold = 1080, c_silver = 1680, c_bronze = 2280}, 
 {name = "Icy Nook", story = false, silver = 3000, bronze = 5100, c_gold = 1710, c_silver = 2280, c_bronze = 2880},
-{name = "Gusty Gully", story = true, silver = 2400, bronze = 4200, c_gold = , c_silver = 1440, c_bronze = 2040},
+{name = "Gusty Gully", story = true, silver = 2400, bronze = 4200, c_gold = 1080, c_silver = 1440, c_bronze = 2040},
 {name = "Coalhouse Climb", story = true, silver = 5100, bronze = 8700, c_gold = 2160, c_silver = 3600, c_bronze = 4800}, 
 {name = "Knightlore Laboratory", story = true, silver = 0, bronze = 0, c_gold = 0, c_silver = 0, c_bronze = 0},
 
@@ -227,7 +227,10 @@ function challenge_percent()
 	local percent = 0
 	for i = 0, 55, 1 do
 		record = memory.read_u16_le(c_record+0x2*i)	--weird way to increment 0x05E6, sorry
-		if record <= challenge_times[i] then percent = percent + 0.1 end
+		--Game does not count toward % if your record was 0 using cheats, so this check works
+		if record <= challenge_times[i] and record > 0 then
+			percent = percent + 0.1
+		end
 	end
 	return percent
 end
@@ -307,7 +310,7 @@ function display_percent()
 	p20 = p20 + check_percent(0x02CE,percent,7)
 	+ check_percent(0x02CF,percent,3,2,1,0)
 	
-	percent = p01 + p03 + p04 + p05 + p10 + p11 + p15 + p20
+	percent = p01 + p03 + p04 + p05 + p10 + p11 + p15 + p20 + challenge_percent()
 	gui.drawText(0,100,"%"..percent,null,null,10,null,null)
 	-- gui.drawText(0,115,"0.1%, 0.3%, 0.4%, 0.5%, 1.0%, 1.1%, 1.5%, 2.0%",null,null,10,null,null)
 	-- gui.drawText(0,130,p01..", "..p03..", "..p04..", "..p05..", "..p10..", "..p11..", "..p15..", "..p20,null,null,10,null,null)
