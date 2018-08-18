@@ -1,31 +1,5 @@
 memory.usememorydomain("IWRAM")
 
---[[NPC layout
-Example for the below:
-41F2 - EID
-41F3 - ELV
-41F4 - EHP(Current)
-41F5 - EHP(Max)
-41F6 - EDP
-41F7 - ESPD
-41F8 - EATK
-41F9 - EDEF
-41FA - ESPEC
-41FB - ???
-41FC - Nature
-41FD - FD
-4207 - Friend
-4208 - 1st move
-4209 - 1st move power
-4210 - 2nd move
-4211 - 2nd move power
-4218 - 3rd move
-4219 - 3rd move power
-4220 - 4th move
-4221 - 4th move power
-4228 - next denjuu's turn
-]]--
-
 local Map = {}
 --Because some of the maps have values all over the place
 function assign_multi(string,...)
@@ -175,6 +149,7 @@ Miss = 0x2C14,
 Crit = 0x2C22,
 Move = 0x2B06,
 Damage = 0x2A0B,
+Talk = 0x50F4, --State of dialogue
 RNG1 = 0x5E08,
 RNG2 = 0x5E10
 }
@@ -197,109 +172,215 @@ Miss = 0x2C24,
 Crit = 0x2C32,
 Move = 0x2B16,
 Damage = 0x2A1B,
+Talk = 0x5104, --State of dialogue
 RNG1 = 0x5E18,
 RNG2 = 0x5E20
 }
 
-local Enemy_data = {
-Level,
-HP_Max,
-HP_Now,
-DP,
-Speed,
-Attack,
-Defence,
-Special,
-Nature,
-FD,
-Friend,
-Attack1,
-Attack2,
-Attack3,
-Attack4,
-Next
-}
+local function GetStats(addr,o)
+	o = o or {} --Construct a table if we didn't get one
+	o.address = bizstring.hex(addr)
+	o.id = memory.readbyte(addr)
+	o.level = memory.readbyte(addr+1)
+	o.exists = memory.readbyte(addr+1) > 0	--unless glitched, level should always be greater than 0
+	o.hp = memory.readbyte(addr+2)
+	o.max_hp = memory.readbyte(addr+3)
+	o.dp = memory.readbyte(addr+4)	--special attack points
+	o.speed = memory.readbyte(addr+5)
+	o.attack = memory.readbyte(addr+6)
+	o.defence = memory.readbyte(addr+7)
+	o.special = memory.readbyte(addr+8)
+	o.nature = memory.readbyte(addr+10)
+	o.fd = memory.readbyte(addr+11)	--something to do with phones
+	o.ally = memory.readbyte(addr+21)	--something to do with phones
+	o.attack1 = memory.readbyte(addr+22)
+	o.attack1_power = memory.readbyte(addr+23)
+	o.attack2 = memory.readbyte(addr+30)
+	o.attack2_power = memory.readbyte(addr+31)
+	o.attack3 = memory.readbyte(addr+38)
+	o.attack3_power = memory.readbyte(addr+39)
+	o.attack4 = memory.readbyte(addr+46)
+	o.attack4_power = memory.readbyte(addr+47)
+	o.next_turn = memory.readbyte(addr+54)
+	--... And so on
+	return o
+end
 
+function display_battle(address, toggle)
+--give the function the addresses it needs
+	local toggle_states = {["None"]=0,["NPC1"]=1,["NPC2"]=2,["NPC3"]=3,["All"]=4}	--to make the magic numbers below understandable
+	local l_toggle
+	local npc = {}	--table of npcs
+	local line	--to make displaying lines readable
+	local battle_state
+	local battle_timer
+	local critical
+	local damage
+	local move_selected
+	local boss
+	local state
+	local npc_count = 0
+	--booleans
+	local in_battle
+	local display_individual
+	local npc_present
+	if address ~= nil then	--make sure address is valid
+		in_battle = (memory.readbyte(address.Music) >= 5 and memory.readbyte(address.Music) <= 9)	--checking music to see if in battle
+		battle_state = memory.readbyte(address.Battle_State)
+		battle_timer = memory.readbyte(address.Battle_Event_Timer)
+		damage = memory.readbyte(address.Damage)
+		critical = memory.readbyte(address.Crit)
+		move_selected = memory.readbyte(address.Move)
+		boss = memory.readbyte(address.Boss)
+		state = memory.readbyte(address.State)
+	else
+		in_battle = false
+	end
+	l_toggle = (toggle ~= nil and toggle or toggle_states["None"])	--default value of 0
+	if in_battle then
+	--Interface for toggling display
+		gui.drawText(0,150,"Denjuu X 1 2 3 A ",null,null,10,null,null) --Click these for info
+		if (input.getmouse().Left and get_mouse_pos(30,150,24,10)) then
+			l_toggle = toggle_states["None"]
+		elseif (input.getmouse().Left and get_mouse_pos(55,150,9,10)) then 
+			l_toggle = toggle_states["NPC1"]
+		elseif (input.getmouse().Left and get_mouse_pos(65,150,11,10)) then 
+			l_toggle =  toggle_states["NPC2"]
+		elseif (input.getmouse().Left and get_mouse_pos(78,150,11,10)) then 
+			l_toggle =  toggle_states["NPC3"]
+		elseif (input.getmouse().Left and get_mouse_pos(90,150,10,10)) then 
+			l_toggle =  toggle_states["All"]
+		else
+		end
+	--Get opponent stats
+		for i = 1, 3 do
+			npc[i] = GetStats(address.Enemy[i])
+			if npc[i].exists then npc_count = npc_count + 1 end
+		end
+	--Draw opponent stats
+		display_individual = (l_toggle > toggle_states["None"] and l_toggle < toggle_states["All"])
+		if display_individual then
+			if npc[l_toggle].exists then
+				line = "E"..l_toggle..Denjuu[npc[l_toggle].id].." ID:"..npc[l_toggle].id
+				gui.drawText(0,20,line,null,null,10,null,null)
+				line = "Ally:"..Denjuu[npc[l_toggle].ally].." ID:"..npc[l_toggle].ally
+				gui.drawText(0,30,line,null,null,10,null,null)
+				line = "LV:"..npc[l_toggle].level.." HP:"..npc[l_toggle].hp.."/"..npc[l_toggle].max_hp.." DP:"..npc[l_toggle].dp
+				gui.drawText(0,40,line,null,null,10,null,null)
+				line = "SPD:"..npc[l_toggle].speed.." ATK:"..npc[l_toggle].attack.." DEF:"..npc[l_toggle].defence.." SPEC:"..npc[l_toggle].special
+				gui.drawText(0,50,line,null,null,10,null,null)
+				line = Attacks[npc[l_toggle].attack1].." | "..Attacks[npc[l_toggle].attack2].."\n"..Attacks[npc[l_toggle].attack3].." | "..Attacks[npc[l_toggle].attack4]
+				gui.drawText(0,60,line,null,null,10,null,null)
+			end
+		end
+	--Display only states, without moves		
+		if toggle == toggle_states["All"] then
+			for i=1,3 do
+				if npc[i].exists then
+					line = "E"..i.." ID:"..npc[i].id.." LV:"..npc[i].level.." HP:"..npc[i].hp.."/"..npc[i].max_hp.." DP:"..npc[i].dp
+					gui.drawText(0,10+(20*i),line,null,null,10,null,null)
+					line = "SPD:"..npc[i].speed.." ATK:"..npc[i].attack.." DEF:"..npc[i].defence.." SPEC:"..npc[i].special
+					gui.drawText(0,20+(20*i),line,null,null,10,null,null)
+				end
+			end
+		end
+	--Other things to display during a battle
+			gui.text(0,220,"Denjuu left:"..npc_count)
+			gui.text(0,235,"Battle State:"..battle_state.." DMG "..damage.."("..critical..")")
+			gui.text(0,250,"Battle timer:"..battle_timer)
+			gui.text(0,280,"BOSS: "..boss.." State: "..state)
+				--Just in case something happens that causes a non-move value to appear (healing for instance)
+		if Attacks[move_selected] ~= nil then
+			gui.text(0,265,"Move: "..Attacks[move_selected].." ("..move_selected..")")
+		else
+			gui.text(0,265,"Move: UNDEFINED ("..move_selected..")")
+		end
+	end
+	return l_toggle
+end
 
+function display_overworld_npc(address)
+	local npc = {x,y,xcam,ycam,state}
+	local music
+	local num = 0	--For NPC
+	local overworld	--boolean
+	if address ~= nil then	--make sure address is valid
+		music = memory.readbyte(address.Music)
+	end
+	--Checking if overworld music is playing to display npc data
+	overworld = music ~= nil and (music >= 17 and music <= 43) or false
+	for i = (version() == "Power" and 0x34E0 or 0x34D0), 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
+		if memory.readbyte(i) ~= 0 then
+			npc.xcam = memory.read_u16_le(i+2)
+			npc.ycam = memory.read_u16_le(i+4)
+			npc.x = string.format('%.1f',memory.read_u32_le(i+12)/65536.0)
+			npc.y = string.format('%.1f',memory.read_u32_le(i+16)/65536.0)
+			npc.state = memory.readbyte(i+31)
+			num = math.floor((i-0x34D0)/0x20)+1	--So it would be 1 offset
+			gui.drawText(npc.xcam-20,npc.ycam,"X"..npc.x.." Y"..npc.y.."s"..npc.state,null,null,10,null,null)
+			gui.drawText(npc.xcam-5,npc.ycam-20,num,null,null,10,null,null)
+		end
+	end
+	gui.text(0,295,"NPCs: "..num)
+end
+
+function display_overworld(address,toggle)
+	local toggle_states = {["None"]=0,["NPC"]=1}
+	local l_toggle
+	local l_map
+	local x
+	local y
+	local rng
+	local counter
+	local money
+	local music
+	--boolean
+	local in_overworld
+	local display_npc
+	if address ~= nil then	--make sure address is valid
+		l_map = memory.readbyte(address.Map)
+		x = memory.read_u32_le(address.Player_X)
+		y = memory.read_u32_le(address.Player_Y)
+		rng = memory.read_u32_le(address.RNG1)
+		counter = memory.read_u32_le(address.Counter)
+		money = memory.read_u32_le(address.Money)
+		music = memory.readbyte(address.Music)
+	end
+	l_toggle = (toggle ~= nil and toggle or toggle_states["None"])	--default value of 0
+		gui.drawText(0,150,"ON  OFF",null,null,10,null,null) --Click these for info
+		if (input.getmouse().Left and get_mouse_pos(0,150,24,10)) then
+			l_toggle = toggle_states["NPC"]
+		elseif (input.getmouse().Left and get_mouse_pos(24,150,24,10)) then
+			l_toggle = toggle_states["None"]
+		end
+	
+	
+	in_overworld = music ~= nil and (music >= 17 and music <= 43) or false
+	if in_overworld then
+		gui.text(0,250,"X:"..string.format('%.6f',x/65536.0).." Y:"..string.format('%.6f',y/65536.0))
+		gui.text(0,265,"RNG:"..rng.." Counter:"..counter)
+		gui.text(0,280,"Music:"..music.." $:"..money)
+		--Just in case something happens that causes map to go above 170
+		if Map[l_map] ~= nil then
+			gui.text(0,235,Map[l_map].."("..l_map..")")
+		end
+		display_npc = (l_toggle == toggle_states["NPC"])
+		if display_npc then
+			display_overworld_npc(address)
+		end
+	end
+	return l_toggle
+end
+
+local battle_toggle = 0	--so this won't get set back to 0 over and over
+local npc_toggle = 0
 while true do
 local Addresses
-local toggle = 1
-local NPC = {x,y,xcam,ycam,state}
-local Enemy_data_table = {Enemy1,Enemy2,Enemy3}
-local num = 0	--For NPC
 	while version() ~= "NA" do
 		Addresses = (version() == "Power" and Power or Speed)
-		gui.text(0,0,"RNG: "..memory.read_u32_le(Addresses.RNG1).." Counter: "..memory.read_u32_le(Addresses.Counter).." $: "..memory.read_u32_le(Addresses.Money))
-
-		--Checking if in battle
-		if (memory.readbyte(Addresses.Music) >= 5 and memory.readbyte(Addresses.Music) <= 9) then
-			gui.drawText(0,150,"Denjuu X 1 2 3 A ",null,null,10,null,null) --Click these for info
-			if (input.getmouse().Left and get_mouse_pos(30,150,24,10)) then
-				toggle = 0
-			elseif (input.getmouse().Left and get_mouse_pos(55,150,9,10)) then 
-				toggle = 1
-			elseif (input.getmouse().Left and get_mouse_pos(65,150,11,10)) then 
-				toggle =  2
-			elseif (input.getmouse().Left and get_mouse_pos(78,150,11,10)) then 
-				toggle =  3
-			elseif (input.getmouse().Left and get_mouse_pos(90,150,10,10)) then 
-				toggle =  4
-			else
-			end
-	--Draw opponent stats
-			if toggle > 0 and toggle < 4 and memory.readbyte(Addresses.Enemy[toggle]+1) > 0 then
-				--gui.drawText(0,30,"E"..toggle..Denjuu[memory.readbyte(Addresses.Enemy[toggle])].."("..memory.readbyte(Addresses.Enemy[toggle])..")".."&"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
-				gui.drawText(0,30,"E"..toggle.." ID:"..memory.readbyte(Addresses.Enemy[toggle]).." Friend:"..Denjuu[memory.readbyte(Addresses.Enemy[toggle]+21)].."("..memory.readbyte(Addresses.Enemy[toggle]+21)..")",null,null,10,null,null)
-				gui.drawText(0,40,"LV:"..memory.readbyte(Addresses.Enemy[toggle]+1).." HP:"..memory.readbyte(Addresses.Enemy[toggle]+2).."/"..memory.readbyte(Addresses.Enemy[toggle]+3).." DP:"..memory.readbyte(Addresses.Enemy[toggle]+4).." ",null,null,10,null,null)
-				gui.drawText(0,50,"SPD:"..memory.readbyte(Addresses.Enemy[toggle]+5).." ATK:"..memory.readbyte(Addresses.Enemy[toggle]+6).." DEF:"..memory.readbyte(Addresses.Enemy[toggle]+7).." SPEC:"..memory.readbyte(Addresses.Enemy[toggle]+8).." ",null,null,10,null,null)
-				gui.drawText(0,60,Attacks[memory.readbyte(Addresses.Enemy[toggle]+22)].." | "..Attacks[memory.readbyte(Addresses.Enemy[toggle]+30)].." ",null,null,10,null,null)
-				gui.drawText(0,70,Attacks[memory.readbyte(Addresses.Enemy[toggle]+38)].." | "..Attacks[memory.readbyte(Addresses.Enemy[toggle]+46)].." ",null,null,10,null,null)
-			end
-	--Display only states, without moves		
-			if toggle == 4 then
-				for i=1,3 do
-					if memory.readbyte(Addresses.Enemy[i]+1) > 0 then	--Since id can be 0, check if level is greater than 0 instead. Also make sure it only appears during battle
-						gui.drawText(0,10+(20*i),"E"..i.." ID:"..memory.readbyte(Addresses.Enemy[i]).." LV:"..memory.readbyte(Addresses.Enemy[i]+1).." HP:"..memory.readbyte(Addresses.Enemy[i]+2).."/"..memory.readbyte(Addresses.Enemy[i]+3).." DP:"..memory.readbyte(Addresses.Enemy[i]+4),null,null,10,null,null)
-						gui.drawText(0,20+(20*i),"SPD:"..memory.readbyte(Addresses.Enemy[i]+5).." ATK:"..memory.readbyte(Addresses.Enemy[i]+6).." DEF:"..memory.readbyte(Addresses.Enemy[i]+7).." SPEC:"..memory.readbyte(Addresses.Enemy[i]+8),null,null,10,null,null)
-					end
-				end
-			end
-	--Other things to display during a battle
-			gui.text(0,235,"Battle State:"..memory.readbyte(Addresses.Battle_State).." DMG "..memory.readbyte(Addresses.Damage).."("..memory.readbyte(Addresses.Crit)..")")
-			gui.text(0,250,"Battle timer:"..memory.readbyte(Addresses.Battle_Event_Timer))
-				--Just in case something happens that causes a non-move value to appear (healing for instance)
-		if Attacks[memory.readbyte(Addresses.Move)] ~= nil then
-			gui.text(0,265,"Move: "..Attacks[memory.readbyte(Addresses.Move)].." ("..memory.readbyte(Addresses.Move)..")")
-		else
-			gui.text(0,265,"Move: UNDEFINED ("..memory.readbyte(Addresses.Move)..")")
-		end
-			gui.text(0,280,"BOSS: "..memory.readbyte(Addresses.Boss).." State: "..memory.readbyte(Addresses.State))
-		end
-	--Checking if overworld music is playing to display npc data
-		if memory.readbyte(Addresses.Music) >= 17 and memory.readbyte(Addresses.Music) <= 43 then
-			for i = (version() == "Power" and 0x34E0 or 0x34D0), 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
-				if memory.readbyte(i) ~= 0 then
-					NPC.xcam = memory.read_u16_le(i+0x2)
-					NPC.ycam = memory.read_u16_le(i+0x4)
-					NPC.x = string.format('%.1f',memory.read_u32_le(i+0xC)/65536.0)
-					NPC.y = string.format('%.1f',memory.read_u32_le(i+0x10)/65536.0)
-					NPC.state = memory.readbyte(i+0x1F)
-					num = math.floor((i-0x34D0)/0x20)+1	--So it would be 1 offset
-					gui.drawText(NPC.xcam-20,NPC.ycam,"X"..NPC.x.." Y"..NPC.y.."s"..NPC.state,null,null,10,null,null)
-					gui.drawText(NPC.xcam-5,NPC.ycam-20,num,null,null,10,null,null)
-				end
-			end
-	--Things to display outside battle
-		gui.text(0,295,"NPCs: "..num.." Counter: "..memory.read_u32_le(Addresses.Counter))
-			--Just in case something happens that causes map to go above 170
-		if Map[memory.readbyte(Addresses.Map)] ~= nil then
-			gui.text(0,235,Map[memory.readbyte(Addresses.Map)].."("..memory.readbyte(Addresses.Map)..")")
-		end
-		gui.text(0,250,"("..string.format('%.6f',memory.read_u32_le(Addresses.Player_X)/65536.0)..","..string.format('%.6f',memory.read_u32_le(Addresses.Player_Y)/65536.0)..")")
-		
-		end
-		
-	emu.frameadvance()
+		battle_toggle = display_battle(Addresses,battle_toggle)
+		npc_toggle = display_overworld(Addresses,npc_toggle)
+		emu.frameadvance()
 	end
 	emu.frameadvance()
 end
