@@ -63,73 +63,412 @@ assign_multi("Uraani Forest",8,9,11,12,13,14)
 Map[10] = "Uraani Tides"
 assign_multi("Uraani Village",88,141,166,168)
 
-local Picture_Book = {
-[0] = 15,[1] = 16,[2] = 17,[3] = 176,[4] = 177,[5] = 18,[6] = 19,[7] = 20,[8] = 21,[9] = 22,
-[10] = 23,[11] = 24,[12] = 25,[13] = 26,[14] = 27,[15] = 28,[16] = 29,[17] = 30,[18] = 31,[19] = 32,
-[20] = 37,[21] = 38,[22] = 39,[23] = 40,[24] = 33,[25] = 34,[26] = 35,[27] = 36,[28] = 41,[29] = 42,
-[30] = 43,[31] = 44,[32] = 45,[33] = 46,[34] = 47,[35] = 48,[36] = 49,[37] = 178,[38] = 179,[39] = 180,
-[40] = 50,[41] = 51,[42] = 52,[43] = 53,[44] = 54,[45] = 55,[46] = 56,[47] = 57,[48] = 58,[49] = 59,
-[50] = 60,[51] = 61,[52] = 62,[53] = 63,[54] = 64,[55] = 65,[56] = 66,[57] = 67,[58] = 68,[59] = 69,
-[60] = 70,[61] = 71,[62] = 72,[63] = 73,[64] = 74,[65] = 75,[66] = 76,[67] = 77,[68] = 78,[69] = 79,
-[70] = 80,[71] = 81,[72] = 82,[73] = 83,[74] = 84,[75] = 85,[76] = 86,[77] = 87,[78] = 181,[79] = 182,
-[80] = 183,[81] = 184,[82] = 185,[83] = 186,[84] = 187,[85] = 88,[86] = 89,[87] = 90,[88] = 188,[89] = 189,
-[90] = 190,[91] = 191,[92] = 192,[93] = 193,[94] = 91,[95] = 92,[96] = 93,[97] = 94,[98] = 194,[99] = 195,
-[100] = 95,[101] = 96,[102] = 97,[103] = 98,[104] = 99,[105] = 100,[106] = 101,[107] = 102,[108] = 103,[109] = 196,
-[110] = 197,[111] = 104,[112] = 105,[113] = 106,[114] = 107,[115] = 108,[116] = 109,[117] = 110,[118] = 111,[119] = 112,
-[120] = 113,[121] = 114,[122] = 115,[123] = 116,[124] = 117,[125] = 118,[126] = 119,[127] = 120,[128] = 121,[129] = 122,
-[130] = 123,[131] = 124,[132] = 125,[133] = 198,[134] = 199,[135] = 126,[136] = 127,[137] = 128,[138] = 129,[139] = 130,
-[140] = 131,[141] = 132,[142] = 133,[143] = 134,[144] = 135,[145] = 136,[146] = 137,[147] = 138,[148] = 139,[149] = 140,
-[150] = 141,[151] = 142,[152] = 143,[153] = 144,[154] = 145,[155] = 146,[156] = 147,[157] = 148,[158] = 149,[159] = 150,
-[160] = 151,[161] = 152,[162] = 153,[163] = 154,[164] = 155,[165] = 156,[166] = 157,[167] = 158,[168] = 159,[169] = 160,
-[170] = 161,[171] = 162,[172] = 163,[173] = 164,[174] = 165,[175] = 166,[176] = 167,[177] = 168,[178] = 169,[179] = 170,
-[180] = 0,[181] = 1,[182] = 2,[183] = 3,[184] = 4,[185] = 5,[186] = 6,[187] = 7,[188] = 8,[189] = 9,
-[190] = 10,[191] = 11,[192] = 12,[193] = 13,[194] = 14,[195] = 171,[196] = 172,[197] = 173,[198] = 174,[199] = 175}
-
 --Attack names
 local Attacks = {
-[0] = "????",[1] = "Spark",[2] = "Falling Star",[3] = "Pillar of Fire",[4] = "Small Fire",[5] = "Will-o\'-the-Wisp",[6] = "Flame Shot",[7] = "Raging Fire",[8] = "Fire Wheel",[9] = "Disk Cutter",
-[10] = "Wheel",[11] = "Chainsaw",[12] = "Drill",[13] = "Rocket Punch",[14] = "Twin Drill",[15] = "Rotation Cutter",[16] = "Spiral Cutter",[17] = "Waterfall",[18] = "Soap Ball",[19] = "Water Drop",
-[20] = "Water Gun",[21] = "Wave Crash",[22] = "Squall",[23] = "Icicle Trap",[24] = "Watersprout",[25] = "Rock Claw",[26] = "Boulder Roll",[27] = "Sand Vortex",[28] = "Boulder Ball",[29] = "Boulder Avalanche",[30] = "Shake-Out",
-[31] = "Falling Rocks",[32] = "Small Quake",[33] = "Vaccum Cutter",[34] = "Shock Wave",[35] = "Whirlwind",[36] = "Gust",[37] = "Flap",[38] = "Tornado",[39] = "Gale",
-[40] = "Kamaitachi",[41] = "Ion Ball",[42] = "Positive Electricity",[43] = "Electric Claw",[44] = "Discharge",[45] = "Electric Shock",[46] = "Electric Arrow",[47] = "Big Electric Current",[48] = "Electric Field",[49] = "Claw",
-[50] = "Iron Claw",[51] = "Scales",[52] = "Ring",[53] = "Bite",[54] = "Beak",[55] = "Kicking",[56] = "Continuous Kicking",[57] = "Sabre",[58] = "Tail",[59] = "Suddenness (1)",
-[60] = "Suddenness (2)",[61] = "Jump",[62] = "Tentacle",[63] = "Numb Tentacle",[64] = "Body Blow",[65] = "Spit Spray",[66] = "Headbutt",[67] = "Suddenness (3)",[68] = "Horn",[69] = "Iron Horn",
-[70] = "Wing",[71] = "Thorn",[72] = "Rush",[73] = "Drain",[74] = "Bloodsuck",[75] = "Strike",[76] = "Razor Punch",[77] = "Hammer Punch",[78] = "Lick",[79] = "Needle",
-[80] = "Suddenness (4)",[81] = "Scissors",[82] = "Petal",[83] = "Feather Sabre",[84] = "Feather Knife",[85] = "Acupuncture",[86] = "Poison Sting",[87] = "Numbing Sting",[88] = "Hoof",[89] = "Suddenness (5)",
-[90] = "Suddenness (6)",[91] = "Whiplash",[92] = "Electric Wire",[93] = "Digestive Fluids",[94] = "Melting Fluids",[95] = "Stab",[96] = "Continuous Stab",[97] = "Ice Rock",[98] = "Big Wave",[99] = "Whirling Tides",
-[100] = "Ice Bullet",[101] = "Blizzard",[102] = "Big Water Pressure",[103] = "Big Tsunami",[104] = "Ion Beam",[105] = "Small Bolt",[106] = "Plasma Laser",[107] = "Lightning Strike",[108] = "Thunder Storm",[109] = "Mega Bolt",
-[110] = "Electric Hell",[111] = "Ibo Ibo Missile",[112] = "Gatling Gun",[113] = "Rapid-Fire Missile",[114] = "Bazooka",[115] = "Drill Missile",[116] = "Homing Missile",[117] = "Bombing",[118] = "Wave Attack",[119] = "Aura Wave",
-[120] = "Sandstorm",[121] = "Big Stream Pressure",[122] = "Vacuum Hole",[123] = "Hurricane",[124] = "Black Hole",[125] = "Heat Beam",[126] = "Small Burn",[127] = "Small Flame",[128] = "Flamethrower",[129] = "Fire Breath",
-[130] = "Big Burn",[131] = "Suddenness (7)",[132] = "Bomb Rock",[133] = "Small Rock",[134] = "Sand Prison",[135] = "Mega Quake",[136] = "Mega Rock",[137] = "Meteor Drop",[138] = "Diamond Rain",[139] = "Mushroom Bomb",
-[140] = "Egg Bomb",[141] = "Bomb",[142] = "Wave Beam",[143] = "Beam Light",[144] = "Blaster",[145] = "Suicide Attack",[146] = "String Discard",[147] = "Adhesive Liquid",[148] = "Smokescreen",[149] = "Flash",
-[150] = "Dust Cloud",[151] = "Recovery",[152] = "Big Recovery",[153] = "Shout",[154] = "Stare",[155] = "Glare",[156] = "Quick Step",[157] = "Speed Up",[158] = "Charging",[159] = "Big Charging",
-[160] = "Ultrasonic",[161] = "Curse Song",[162] = "Iron Defense",[163] = "Venom",[164] = "Poison Gas",[165] = "Numb Gas",[166] = "Cure",[167] = "Alarm Clock",[168] = "Roar",[169] = "Hot Wind",
-[170] = "Shrill Voice",[171] = "Cold Air",[172] = "Sleep Gas",[173] = "Lullaby",[174] = "Meditate",[175] = "Denma Barrier",[176] = "Persist",[177] = "Support",[178] = "Defense",[179] = "Shield",
-[180] = "Blessing",[181] = "Contemplate",[182] = "Hide",[183] = "Dive",[184] = "Skin Thicken",[185] = "Avoid",[186] = "Spore Shed",[187] = "Tongue Sticking Out",[188] = "Provoke",[189] = "Denma Seal",
-[190] = "Denma Drain",[191] = "Twister Song",[192] = "Energy Break",[193] = "Mega Break",[194] = "Count Down",[195] = "Strawberry Kiss",[196] = "Injection Plug",[197] = "Deflation Spiral",[198] = "Hot Bath",[199] = "Nove Smasher"}
+[0] = {Name = "????", Type = "None"},
+[1] = {Name = "Ember", Type = "Fire"},
+[2] = {Name = "Fireball", Type = "Fire"},
+[3] = {Name = "Fire Pillar", Type = "Fire"},
+[4] = {Name = "Petit Fire", Type = "Fire"},
+[5] = {Name = "	Will o' Wisp", Type = "Fire"},
+[6] = {Name = "Flame Shot", Type ="Fire" },
+[7] = {Name = "Blaze", Type = "Fire"},
+[8] = {Name = "Fire Wheel", Type = "Fire"},
+[9] = {Name = "Disk Cutter", Type = "Machine"},
+[10] = {Name = "Wheel", Type = "Machine"},
+[11] = {Name = "Chainsaw", Type = "Machine"},
+[12] = {Name = "Drill", Type = "Machine"},
+[13] = {Name = "Rocket Punch", Type = "Machine"},
+[14] = {Name = "Twin Drill", Type = "Machine"},
+[15] = {Name = "Spin Cutter", Type = "Machine"},
+[16] = {Name = "Spiral Cut", Type = "Machine"},
+[17] = {Name = "Waterfall", Type = "Water"},
+[18] = {Name = "Bubble", Type = "Water"},
+[19] = {Name = "Rainfall", Type = "Water"},
+[20] = {Name = "Water Gun", Type = "Water"},
+[21] = {Name = "Wave Crash", Type = "Water"},
+[22] = {Name = "Squall", Type = "Water"},
+[23] = {Name = "Icicle Drop", Type = "Water"},
+[24] = {Name = "Watersprout", Type = "Water"},
+[25] = {Name = "Rock Claw", Type = "Rock"},
+[26] = {Name = "Rock Roll", Type = "Rock"},
+[27] = {Name = "Dust Devil", Type = "Rock"},
+[28] = {Name = "Rock Ball", Type = "Rock"},
+[29] = {Name = "Rock Slide", Type = "Rock"},
+[30] = {Name = "Sand Shot", Type = "Rock"},
+[31] = {Name = "Rock Fall", Type = "Rock"},
+[32] = {Name = "Petit Quake", Type = "Rock"},
+[33] = {Name = "Vaccum Cutter", Type = "Wind"},
+[34] = {Name = "Shockwave", Type = "Wind"},
+[35] = {Name = "Whirlwind", Type = "Wind"},
+[36] = {Name = "Gust", Type = "Wind"},
+[37] = {Name = "Wing Beat", Type = "Wind"},
+[38] = {Name = "Tornado", Type = "Wind"},
+[39] = {Name = "Gale", Type = "Wind"},
+[40] = {Name = "Kamaitachi", Type = "Wind"},
+[41] = {Name = "Ion Ball", Type = "Electric"},
+[42] = {Name = "Static", Type = "Electric"},
+[43] = {Name = "Electric Claw", Type = "Electric"},
+[44] = {Name = "Discharge", Type = "Electric"},
+[45] = {Name = "Electric Shock", Type = "Electric"},
+[46] = {Name = "Electric Arrow", Type = "Electric"},
+[47] = {Name = "Voltage", Type = "Electric"},
+[48] = {Name = "Electric Field", Type = "Electric"},
+[49] = {Name = "Claw", Type = "Normal"},
+[50] = {Name = "Iron Claw", Type = "Normal"},
+[51] = {Name = "Scale Shot", Type = "Normal"},
+[52] = {Name = "Ring", Type = "Normal"},
+[53] = {Name = "Bite", Type = "Normal"},
+[54] = {Name = "Beak", Type = "Normal"},
+[55] = {Name = "Kick", Type = "Normal"},
+[56] = {Name = "Multi-Kick", Type = "Normal"},
+[57] = {Name = "Sabre", Type = "Normal"},
+[58] = {Name = "Tail", Type = "Normal"},
+[59] = {Name = "Removed (1)", Type = "None"},
+[60] = {Name = "Removed (2)", Type = "None"},
+[61] = {Name = "Jump", Type = "Normal"},
+[62] = {Name = "Tentacle", Type = "Normal"},
+[63] = {Name = "Stun Tentacle", Type = "Normal"},
+[64] = {Name = "Tackle", Type = "Normal"},
+[65] = {Name = "Spit Spray", Type = "Normal"},
+[66] = {Name = "Headbutt", Type = "Normal"},
+[67] = {Name = "Removed (3)", Type = "None"},
+[68] = {Name = "Horn", Type = "Normal"},
+[69] = {Name = "Iron Horn", Type = "Normal"},
+[70] = {Name = "Wing", Type = "Normal"},
+[71] = {Name = "Thorn", Type = "Normal"},
+[72] = {Name = "Rush", Type = "Normal"},
+[73] = {Name = "Drain", Type = "Normal"},
+[74] = {Name = "Bloodsuck", Type = "Normal"},
+[75] = {Name = "Strike", Type = "Normal"},
+[76] = {Name = "Razor Punch", Type = "Normal"},
+[77] = {Name = "Hammer Punch", Type = "Normal"},
+[78] = {Name = "Lick", Type = "Normal"},
+[79] = {Name = "Needle", Type = "Normal"},
+[80] = {Name = "Removed (4)", Type = "None"},
+[81] = {Name = "Scissor", Type = "Normal"},
+[82] = {Name = "Petals", Type = "Normal"},
+[83] = {Name = "Wing Sabre", Type = "Normal"},
+[84] = {Name = "Feather Knife", Type = "Normal"},
+[85] = {Name = "Sting", Type = "Normal"},
+[86] = {Name = "Poison Sting", Type = "Normal"},
+[87] = {Name = "Numbing Sting", Type = "Normal"},
+[88] = {Name = "Hoof", Type = "Normal"},
+[89] = {Name = "Removed (5)", Type = "None"},
+[90] = {Name = "Removed (6)", Type = "None"},
+[91] = {Name = "Whip", Type = "Normal"},
+[92] = {Name = "Denma Wire", Type = "Normal"},
+[93] = {Name = "Stomach Acid", Type = "Normal"},
+[94] = {Name = "Acid", Type = "Normal"},
+[95] = {Name = "Stab", Type = "Normal"},
+[96] = {Name = "Multi-Stab", Type = "Normal"},
+[97] = {Name = "Ice Rock", Type = "Water"},
+[98] = {Name = "Big Wave", Type = "Water"},
+[99] = {Name = "Whirlpool", Type = "Water"},
+[100] = {Name = "Ice Bullet", Type = "Water"},
+[101] = {Name = "Blizzard", Type = "Water"},
+[102] = {Name = "Water Pressure", Type = "Water"},
+[103] = {Name = "Big Tsunami", Type = "Water"},
+[104] = {Name = "Ion Beam", Type = "Electric"},
+[105] = {Name = "Petit Bolt", Type = "Electric"},
+[106] = {Name = "Plasma Laser", Type = "Electric"},
+[107] = {Name = "Lightning Strike", Type = "Electric"},
+[108] = {Name = "Thunderstorm", Type = "Electric"},
+[109] = {Name = "Mega Bolt", Type = "Electric"},
+[110] = {Name = "Electric Prison", Type = "Electric"},
+[111] = {Name = "Wart Missile", Type = "Machine"},
+[112] = {Name = "Gatling Gun", Type = "Machine"},
+[113] = {Name = "Rapid Missile", Type = "Machine"},
+[114] = {Name = "Bazooka", Type = "Machine"},
+[115] = {Name = "Drill Missile", Type = "Machine"},
+[116] = {Name = "Homing Missile", Type = "Machine"},
+[117] = {Name = "Bombing Run", Type = "Machine"},
+[118] = {Name = "Wave Cutter", Type = "Wind"},
+[119] = {Name = "Pulse Wave", Type = "Wind"},
+[120] = {Name = "Sandstorm", Type = "Wind"},
+[121] = {Name = "Pressure", Type = "Wind"},
+[122] = {Name = "Vacuum Hole", Type = "Wind"},
+[123] = {Name = "Hurricane", Type = "Wind"},
+[124] = {Name = "Black Hole", Type = "Wind"},
+[125] = {Name = "Heat Ray", Type = "Fire"},
+[126] = {Name = "Petit Burn", Type = "Fire"},
+[127] = {Name = "Petit Flame", Type = "Fire"},
+[128] = {Name = "Flamethrower", Type = "Fire"},
+[129] = {Name = "Fire Breath", Type = "Fire"},
+[130] = {Name = "Big Burn", Type = "Fire"},
+[131] = {Name = "Removed (7)", Type = "None"},
+[132] = {Name = "Bomb Rock", Type = "Rock"},
+[133] = {Name = "Petit Rock", Type = "Rock"},
+[134] = {Name = "Sand Prison", Type = "Rock"},
+[135] = {Name = "Mega Quake", Type = "Rock"},
+[136] = {Name = "Mega Rock", Type = "Rock"},
+[137] = {Name = "Meteor Drop", Type = "Rock"},
+[138] = {Name = "Diamond Rain", Type = "Rock"},
+[139] = {Name = "Mushroom Bomb", Type = "Normal"},
+[140] = {Name = "Egg Bomb", Type = "Normal"},
+[141] = {Name = "Bomb", Type = "Normal"},
+[142] = {Name = "Pulse Beam", Type = "Normal"},
+[143] = {Name = "Ray Beam", Type = "Normal"},
+[144] = {Name = "Blaster", Type = "Normal"},
+[145] = {Name = "Suicide Attack", Type = "Normal"},
+[146] = {Name = "Silk Shot", Type = "Offence"},
+[147] = {Name = "Sticky Goo", Type = "Offence"},
+[148] = {Name = "Smokescreen", Type = "Offence"},
+[149] = {Name = "Flash", Type = "Offence"},
+[150] = {Name = "Dust Cloud", Type = "Offence"},
+[151] = {Name = "Recover", Type = "Defence"},
+[152] = {Name = "Restore", Type = "Defence"},
+[153] = {Name = "Shout", Type = "Offence"},
+[154] = {Name = "Stare", Type = "Offence"},
+[155] = {Name = "Glare", Type = "Offence"},
+[156] = {Name = "Quick Step", Type = "Defence"},
+[157] = {Name = "Speed Up", Type = "Defence"},
+[158] = {Name = "Charge", Type = "Defence"},
+[159] = {Name = "Full Charge", Type = "Defence"},
+[160] = {Name = "Ultrasonic", Type = "Offence"},
+[161] = {Name = "Curse Song", Type = "Offence"},
+[162] = {Name = "Iron Defense", Type = "Defence"},
+[163] = {Name = "Poison", Type = "Normal"},
+[164] = {Name = "Poison Gas", Type = "Normal"},
+[165] = {Name = "Stun Gas", Type = "Offence"},
+[166] = {Name = "Cure", Type = "Defence"},
+[167] = {Name = "Awaken", Type = "Defence"},
+[168] = {Name = "Roar", Type = "Offence"},
+[169] = {Name = "Heat Wave", Type = "Offence"},
+[170] = {Name = "Shriek", Type = "Offence"},
+[171] = {Name = "Chill", Type = "Offence"},
+[172] = {Name = "Sleep Gas", Type = "Offence"},
+[173] = {Name = "Lullaby", Type = "Offence"},
+[174] = {Name = "Focus", Type = "Defence"},
+[175] = {Name = "Denma Barrier", Type = "Defence"},
+[176] = {Name = "Brace", Type = "Defence"},
+[177] = {Name = "Cheer", Type = "Defence"},
+[178] = {Name = "Defend", Type = "Defence"},
+[179] = {Name = "Shield", Type = "Defence"},
+[180] = {Name = "Bless", Type = "Defence"},
+[181] = {Name = "Meditate", Type = "Defence"},
+[182] = {Name = "Dig", Type = "Defence"},
+[183] = {Name = "Dive", Type = "Defence"},
+[184] = {Name = "Fly", Type = "Defence"},
+[185] = {Name = "Evade", Type = "Defence"},
+[186] = {Name = "Spore Cloud", Type = "Defence"},
+[187] = {Name = "Taunt", Type = "Offence"},
+[188] = {Name = "Provoke", Type = "Offence"},
+[189] = {Name = "Denma Seal", Type = "Offence"},
+[190] = {Name = "Denma Drain", Type = "Offence"},
+[191] = {Name = "Death Song", Type = "Offence"},
+[192] = {Name = "Energy Break", Type = "Offence"},
+[193] = {Name = "Mega Break", Type = "Offence"},
+[194] = {Name = "Count Down", Type = "Offence"},
+[195] = {Name = "Strawberry Kiss", Type = "Defence"},
+[196] = {Name = "Injection Plug", Type = "Machine"},
+[197] = {Name = "Deflation Spiral", Type = "Normal"},
+[198] = {Name = "Healing Spring", Type = "Defence"},
+[199] = {Name = "Nove Smasher", Type = "Fire"}
+}
 
 --List of Denjuu by names, sorted by Index
-local Denjuu = {
-[0] = "Muscovy (Basic)",[1] = "Muscovy (Natural)",[2] = "Muscovy (Aquatic)",[3] = "Major (Basic)",[4] = "Major (Grassland)",[5] = "Fraby (Basic)",[6] = "Fraby (Mountain)",[7] = "Fraby (Sky)",[8] = "Kagu (Basic)",[9] = "Kagu (Natural)",
-[10] = "Purchera (Basic)",[11] = "Purchera (Sky)",[12] = "Purchera (Forest)",[13] = "Mentalis (Basic)",[14] = "Mentalis (Natural)",[15] = "Mentalis (Forest)",[16] = "Mentalis (Grassland)",[17] = "Karinota (Basic)",[18] = "Karinota (Grassland)",[19] = "Karinota (Mountain)",
-[20] = "Chukar (Basic)",[21] = "Chukar (Natural)",[22] = "Chukar (Mountain)",[23] = "Chukar (Aquatic)",[24] = "Laperouse (Basic)",[25] = "Laperouse  (Natural)",[26] = "Laperouse (Desert)",[27] = "Laperouse (Grassland)",[28] = "Anpipitto (Basic)",[29] = "Anpipitto (Sky)",
-[30] = "Anpipitto (Desert)",[31] = "Ruficors (Basic)",[32] = "Ruficors (Grassland)",[33] = "Ruficors (Aquatic)",[34] = "Cotta (Basic)",[35] = "Cotta (Natural)",[36] = "Cotta (Desert)",[37] = "Rupicola (Basic)",[38] = "Rupicola (Grassland)",[39] = "Rupicola (Sky)",
-[40] = "Willcock (Basic)",[41] = "Willcock (Natural)",[42] = "Willcock (Forest)",[43] = "Skrippa (Basic)",[44] = "Skrippa (Aquatic)",[45] = "Cabot (Basic)",[46] = "Cabot (Natural)",[47] = "Makyuretto (Basic)",[48] = "Makyuretto (Natural)",[49] = "Makyuretto (Grassland)",
-[50] = "Makyuretto (Forest)",[51] = "Coronet (Basic)",[52] = "Coronet (Aquatic)",[53] = "Coronet (Grassland)",[54] = "Tataupa (Basic)",[55] = "Tataupa (Desert)",[56] = "Tataupa (Forest)",[57] = "Chigomozu (Basic)",[58] = "Chigomozu (Natural)",[59] = "Koikaru (Basic)",
-[60] = "Koikaru (Natural)",[61] = "Koikaru (Forest)",[62] = "Pewee (Basic)",[63] = "Pewee (Natural)",[64] = "Pewee (Aquatic)",[65] = "Pewee (Mountain)",[66] = "Chapmani (Basic)",[67] = "Chapmani (Natural)",[68] = "Hyuming (Basic)",[69] = "Hyuming (Natural)",
-[70] = "Hyuming (Mountain)",[71] = "Pamirio (Basic)",[72] = "Pamirio (Natural)",[73] = "Pamirio (Sky)",[74] = "Pamirio (Desert)",[75] = "Mistashi (Basic)",[76] = "Mistashi (Forest)",[77] = "Mistashi (Aquatic)",[78] = "Parrotto (Basic)",[79] = "Parrotto (Natural)",
-[80] = "Nebularia (Basic)",[81] = "Nebularia (Natural)",[82] = "Granti (Basic)",[83] = "Granti (Nautral)",[84] = "Granti (Desert)",[85] = "Penelope (Basic)",[86] = "Penelope (Aquatic)",[87] = "Penelope (Mountain)",[88] = "Ardea (Basic)",[89] = "Ardea (Natural)",
-[90] = "Ardea (Forest)",[91] = "Cerator (Basic)",[92] = "Cerator (Natural)",[93] = "Cerator (Mountain)",[94] = "Alpina (Basic)",[95] = "Alpina (Natural)",[96] = "Alpina (Aquatic)",[97] = "Alpina (Sky)",[98] = "Isuka (Basic)",[99] = "Isuka (Grassland)",
-[100] = "Bicolour (Basic)",[101] = "Bicolour (Natural)",[102] = "Hermit (Basic)",[103] = "Hermit (Natural)",[104] = "Hermit (Desert)",[105] = "Hermit (Grassland)",[106] = "Phoebe (Basic)",[107] = "Phoebe (Aquatic)",[108] = "Phoebe (Desert)",[109] = "Blossom (Basic)",
-[110] = "Blossom (Mountain)",[111] = "Rabricol (Basic)",[112] = "Rabricol (Natural)",[113] = "Rabricol (Aquatic)",[114] = "Demerus (Basic)",[115] = "Demerus (Natural)",[116] = "Demerus (Desert)",[117] = "Sparsa (Basic)",[118] = "Sparsa (Natural)",[119] = "Sparsa (Forest)",
-[120] = "Purprea (Basic)",[121] = "Purprea (Sky)",[122] = "Purprea (Grassland)",[123] = "Etopirika (Basic)",[124] = "Etopirika (Natural)",[125] = "Etopirika (Forest)",[126] = "Regulus (Basic)",[127] = "Regulus (Desert)",[128] = "Regulus (Sky)",[129] = "Akretto (Basic)",
-[130] = "Akretto (Natural)",[131] = "Akretto (Grassland)",[132] = "Akretto (Mountain)",[133] = "Seiran (Basic)",[134] = "Seiran (Mountain)",[135] = "Tectus (Basic)",[136] = "Tectus (Natural)",[137] = "Serrata (Basic)",[138] = "Serrata (Sky)",[139] = "Serrata (Forest)",
-[140] = "Kaya (T2)",[141] = "Beebalm (T2)",[142] = "Easydog (T2)",[143] = "Ruscus (T2)",[144] = "Ryuuguu (T2)",[145] = "Kanzou (T2)",[146] = "Ornithogalum (T2)",[147] = "Teletel (T2)",[148] = "Dendel (T2)",[149] = "Suguri (T2)",
-[150] = "Suguline (T2)",[151] = "Saiguliger (T2)",[152] = "Punica (T2)",[153] = "Punisto (T2)",[154] = "Oshe (T2)",[155] = "Barriarm (T2)",[156] = "Bashou (T2)",[157] = "Gentiana (T2)",[158] = "Gonum (T2)",[159] = "Gust (T2)",
-[160] = "Storm (T2)",[161] = "Tsunonasu (T2)",[162] = "Gigagigearth (T2)",[163] = "Liriope (T2)",[164] = "Lirimonarch (T2)",[165] = "Waratah (T2)",[166] = "Enteiou (T2)",[167] = "Gumi (T2)",[168] = "Gymnos (T2)",[169] = "Gymbaron (T2)",
-[170] = "Gymzyrus (T2)",[171] = "Gymzatan (T2)",[172] = "Angios (T2)",[173] = "Angigorgo (T2)",[174] = "Angipower (T2)",[175] = "Angioros (T2)",[176] = "Fungus (T2)",[177] = "Fungwar (T2)",[178] = "Funboost (T2)",[179] = "Funblade (T2)",
-[180] = "Rex (Basic)",[181] = "Rex (Natural-1)",[182] = "Rex (Desert)",[183] = "Rex (Forest)",[184] = "Rex (Natural-2)",[185] = "Doon (Basic)",[186] = "Doon (Natural-1)",[187] = "Doon (Sky)",[188] = "Doon (Aquatic)",[189] = "Doon (Natural-2)",
-[190] = "Gyuun (Basic)",[191] = "Gyuun (Natural-1)",[192] = "Gyuun (Aquatic)",[193] = "Gyuun (Forest)",[194] = "Gyuun (Natural-2)",[195] = "Diablos (Basic)",[196] = "Diablos (Natural-1)",[197] = "Diablos (Mountain)",[198] = "Diablos (Grassland)",[199] = "Diablos (Natural-2)"}
+local Denjuu = {[0] = {Name = "Muscovy (Basic)", Photo = 15},
+[1] = {Name = "Muscovy (Natural)", Photo = 16},
+[2] = {Name = "Muscovy (Aquatic)", Photo = 17},
+[3] = {Name = "Major (Basic)", Photo = 176},
+[4] = {Name = "Major (Grassland)", Photo = 177},
+[5] = {Name = "Fraby (Basic)", Photo = 18},
+[6] = {Name = "Fraby (Mountain)", Photo = 19},
+[7] = {Name = "Fraby (Sky)", Photo = 20},
+[8] = {Name = "Kagu (Basic)", Photo = 21},
+[9] = {Name = "Kagu (Natural)", Photo = 22},
+[10] = {Name = "Purchera (Basic)", Photo = 23}, 
+[11] = {Name = "Purchera (Sky)", Photo = 24},
+[12] = {Name = "Purchera (Forest)", Photo = 25},
+[13] = {Name = "Mentalis (Basic)", Photo = 26},
+[14] = {Name = "Mentalis (Natural)", Photo = 27},
+[15] = {Name = "Mentalis (Forest)", Photo = 28},
+[16] = {Name = "Mentalis (Grassland)", Photo = 29},
+[17] = {Name = "Karinota (Basic)", Photo = 30},
+[18] = {Name = "Karinota (Grassland)", Photo = 31},
+[19] = {Name = "Karinota (Mountain)", Photo = 32},
+[20] = {Name = "Chukar (Basic)", Photo = 37}, 
+[21] = {Name = "Chukar (Natural)", Photo = 38},
+[22] = {Name = "Chukar (Mountain)", Photo = 39},
+[23] = {Name = "Chukar (Aquatic)", Photo = 40},
+[24] = {Name = "Laperouse (Basic)", Photo = 33},
+[25] = {Name = "Laperouse  (Natural)", Photo = 34},
+[26] = {Name = "Laperouse (Desert)", Photo = 35},
+[27] = {Name = "Laperouse (Grassland)", Photo = 36},
+[28] = {Name = "Anpipitto (Basic)", Photo = 41},
+[29] = {Name = "Anpipitto (Sky)", Photo = 42},
+[30] = {Name = "Anpipitto (Desert)", Photo = 43}, 
+[31] = {Name = "Ruficors (Basic)", Photo = 44},
+[32] = {Name = "Ruficors (Grassland)", Photo = 45},
+[33] = {Name = "Ruficors (Aquatic)", Photo = 46},
+[34] = {Name = "Cotta (Basic)", Photo = 47},
+[35] = {Name = "Cotta (Natural)", Photo = 48},
+[36] = {Name = "Cotta (Desert)", Photo = 49},
+[37] = {Name = "Rupicola (Basic)", Photo = 178},
+[38] = {Name = "Rupicola (Grassland)", Photo = 179},
+[39] = {Name = "Rupicola (Sky)", Photo = 180},
+[40] = {Name = "Willcock (Basic)", Photo = 50}, 
+[41] = {Name = "Willcock (Natural)", Photo = 51},
+[42] = {Name = "Willcock (Forest)", Photo = 52},
+[43] = {Name = "Skrippa (Basic)", Photo = 53},
+[44] = {Name = "Skrippa (Aquatic)", Photo = 54},
+[45] = {Name = "Cabot (Basic)", Photo = 55},
+[46] = {Name = "Cabot (Natural)", Photo = 56},
+[47] = {Name = "Makyuretto (Basic)", Photo = 57},
+[48] = {Name = "Makyuretto (Natural)", Photo = 58},
+[49] = {Name = "Makyuretto (Grassland)", Photo = 59},
+[50] = {Name = "Makyuretto (Forest)", Photo = 60}, 
+[51] = {Name = "Coronet (Basic)", Photo = 61},
+[52] = {Name = "Coronet (Aquatic)", Photo = 62},
+[53] = {Name = "Coronet (Grassland)", Photo = 63},
+[54] = {Name = "Tataupa (Basic)", Photo = 64},
+[55] = {Name = "Tataupa (Desert)", Photo = 65},
+[56] = {Name = "Tataupa (Forest)", Photo = 66},
+[57] = {Name = "Chigomozu (Basic)", Photo = 67},
+[58] = {Name = "Chigomozu (Natural)", Photo = 68},
+[59] = {Name = "Koikaru (Basic)", Photo = 69},
+[60] = {Name = "Koikaru (Natural)", Photo = 70}, 
+[61] = {Name = "Koikaru (Forest)", Photo = 71},
+[62] = {Name = "Pewee (Basic)", Photo = 72},
+[63] = {Name = "Pewee (Natural)", Photo = 73},
+[64] = {Name = "Pewee (Aquatic)", Photo = 74},
+[65] = {Name = "Pewee (Mountain)", Photo = 75},
+[66] = {Name = "Chapmani (Basic)", Photo = 76},
+[67] = {Name = "Chapmani (Natural)", Photo = 77},
+[68] = {Name = "Hyuming (Basic)", Photo = 78},
+[69] = {Name = "Hyuming (Natural)", Photo = 79},
+[70] = {Name = "Hyuming (Mountain)", Photo = 80}, 
+[71] = {Name = "Pamirio (Basic)", Photo = 81},
+[72] = {Name = "Pamirio (Natural)", Photo = 82},
+[73] = {Name = "Pamirio (Sky)", Photo = 83},
+[74] = {Name = "Pamirio (Desert)", Photo = 84},
+[75] = {Name = "Mistashi (Basic)", Photo = 85},
+[76] = {Name = "Mistashi (Forest)", Photo = 86},
+[77] = {Name = "Mistashi (Aquatic)", Photo = 87},
+[78] = {Name = "Parrotto (Basic)", Photo = 181},
+[79] = {Name = "Parrotto (Natural)", Photo = 182},
+[80] = {Name = "Nebularia (Basic)", Photo = 183}, 
+[81] = {Name = "Nebularia (Natural)", Photo = 184},
+[82] = {Name = "Granti (Basic)", Photo = 185},
+[83] = {Name = "Granti (Nautral)", Photo = 186},
+[84] = {Name = "Granti (Desert)", Photo = 187},
+[85] = {Name = "Penelope (Basic)", Photo = 88},
+[86] = {Name = "Penelope (Aquatic)", Photo = 89},
+[87] = {Name = "Penelope (Mountain)", Photo = 90},
+[88] = {Name = "Ardea (Basic)", Photo = 188},
+[89] = {Name = "Ardea (Natural)", Photo = 189},
+[90] = {Name = "Ardea (Forest)", Photo = 190}, 
+[91] = {Name = "Cerator (Basic)", Photo = 191},
+[92] = {Name = "Cerator (Natural)", Photo = 192},
+[93] = {Name = "Cerator (Mountain)", Photo = 193},
+[94] = {Name = "Alpina (Basic)", Photo = 91},
+[95] = {Name = "Alpina (Natural)", Photo = 92},
+[96] = {Name = "Alpina (Aquatic)", Photo = 93},
+[97] = {Name = "Alpina (Sky)", Photo = 94},
+[98] = {Name = "Isuka (Basic)", Photo = 194},
+[99] = {Name = "Isuka (Grassland)", Photo = 195},
+[100] = {Name = "Bicolour (Basic)", Photo = 95}, 
+[101] = {Name = "Bicolour (Natural)", Photo = 96},
+[102] = {Name = "Hermit (Basic)", Photo = 97},
+[103] = {Name = "Hermit (Natural)", Photo = 98},
+[104] = {Name = "Hermit (Desert)", Photo = 99},
+[105] = {Name = "Hermit (Grassland)", Photo = 100},
+[106] = {Name = "Phoebe (Basic)", Photo = 101},
+[107] = {Name = "Phoebe (Aquatic)", Photo = 102},
+[108] = {Name = "Phoebe (Desert)", Photo = 103},
+[109] = {Name = "Blossom (Basic)", Photo = 196},
+[110] = {Name = "Blossom (Mountain)", Photo = 197}, 
+[111] = {Name = "Rabricol (Basic)", Photo = 104},
+[112] = {Name = "Rabricol (Natural)", Photo = 105},
+[113] = {Name = "Rabricol (Aquatic)", Photo = 106},
+[114] = {Name = "Demerus (Basic)", Photo = 107},
+[115] = {Name = "Demerus (Natural)", Photo = 108},
+[116] = {Name = "Demerus (Desert)", Photo = 109},
+[117] = {Name = "Sparsa (Basic)", Photo = 110},
+[118] = {Name = "Sparsa (Natural)", Photo = 111},
+[119] = {Name = "Sparsa (Forest)", Photo = 112},
+[120] = {Name = "Purprea (Basic)", Photo = 113}, 
+[121] = {Name = "Purprea (Sky)", Photo = 114},
+[122] = {Name = "Purprea (Grassland)", Photo = 115},
+[123] = {Name = "Etopirika (Basic)", Photo = 116},
+[124] = {Name = "Etopirika (Natural)", Photo = 117},
+[125] = {Name = "Etopirika (Forest)", Photo = 118},
+[126] = {Name = "Regulus (Basic)", Photo = 119},
+[127] = {Name = "Regulus (Desert)", Photo = 120},
+[128] = {Name = "Regulus (Sky)", Photo = 121},
+[129] = {Name = "Akretto (Basic)", Photo = 122},
+[130] = {Name = "Akretto (Natural)", Photo = 123}, 
+[131] = {Name = "Akretto (Grassland)", Photo = 124},
+[132] = {Name = "Akretto (Mountain)", Photo = 125},
+[133] = {Name = "Seiran (Basic)", Photo = 198},
+[134] = {Name = "Seiran (Mountain)", Photo = 199},
+[135] = {Name = "Tectus (Basic)", Photo = 126},
+[136] = {Name = "Tectus (Natural)", Photo = 127},
+[137] = {Name = "Serrata (Basic)", Photo = 128},
+[138] = {Name = "Serrata (Sky)", Photo = 129},
+[139] = {Name = "Serrata (Forest)", Photo = 130},
+[140] = {Name = "Kaya (T2)", Photo = 131}, 
+[141] = {Name = "Beebalm (T2)", Photo = 132},
+[142] = {Name = "Easydog (T2)", Photo = 133},
+[143] = {Name = "Ruscus (T2)", Photo = 134},
+[144] = {Name = "Ryuuguu (T2)", Photo = 135},
+[145] = {Name = "Kanzou (T2)", Photo = 136},
+[146] = {Name = "Ornithogalum (T2)", Photo = 137},
+[147] = {Name = "Teletel (T2)", Photo = 138},
+[148] = {Name = "Dendel (T2)", Photo = 139},
+[149] = {Name = "Suguri (T2)", Photo = 140},
+[150] = {Name = "Suguline (T2)", Photo = 141}, 
+[151] = {Name = "Saiguliger (T2)", Photo = 142},
+[152] = {Name = "Punica (T2)", Photo = 143},
+[153] = {Name = "Punisto (T2)", Photo = 144},
+[154] = {Name = "Oshe (T2)", Photo = 145},
+[155] = {Name = "Barriarm (T2)", Photo = 146},
+[156] = {Name = "Bashou (T2)", Photo = 147},
+[157] = {Name = "Gentiana (T2)", Photo = 148},
+[158] = {Name = "Gonum (T2)", Photo = 149},
+[159] = {Name = "Gust (T2)", Photo = 150},
+[160] = {Name = "Storm (T2)", Photo = 151}, 
+[161] = {Name = "Tsunonasu (T2)", Photo = 152},
+[162] = {Name = "Gigagigearth (T2)", Photo = 153},
+[163] = {Name = "Liriope (T2)", Photo = 154},
+[164] = {Name = "Lirimonarch (T2)", Photo = 155},
+[165] = {Name = "Waratah (T2)", Photo = 156},
+[166] = {Name = "Enteiou (T2)", Photo = 157},
+[167] = {Name = "Gumi (T2)", Photo = 158},
+[168] = {Name = "Gymnos (T2)", Photo = 159},
+[169] = {Name = "Gymbaron (T2)", Photo = 160},
+[170] = {Name = "Gymzyrus (T2)", Photo = 161}, 
+[171] = {Name = "Gymzatan (T2)", Photo = 162},
+[172] = {Name = "Angios (T2)", Photo = 163},
+[173] = {Name = "Angigorgo (T2)", Photo = 164},
+[174] = {Name = "Angipower (T2)", Photo = 165},
+[175] = {Name = "Angioros (T2)", Photo = 166},
+[176] = {Name = "Fungus (T2)", Photo = 167},
+[177] = {Name = "Fungwar (T2)", Photo = 168},
+[178] = {Name = "Funboost (T2)", Photo = 169},
+[179] = {Name = "Funblade (T2)", Photo = 170},
+[180] = {Name = "Rex (Basic)", Photo = 0}, 
+[181] = {Name = "Rex (Natural-1)", Photo = 1},
+[182] = {Name = "Rex (Desert)", Photo = 2},
+[183] = {Name = "Rex (Forest)", Photo = 3},
+[184] = {Name = "Rex (Natural-2)", Photo = 4},
+[185] = {Name = "Doon (Basic)", Photo = 5},
+[186] = {Name = "Doon (Natural-1)", Photo = 6},
+[187] = {Name = "Doon (Sky)", Photo = 7},
+[188] = {Name = "Doon (Aquatic)", Photo = 8},
+[189] = {Name = "Doon (Natural-2)", Photo = 9},
+[190] = {Name = "Gyuun (Basic)", Photo = 10}, 
+[191] = {Name = "Gyuun (Natural-1)", Photo = 11},
+[192] = {Name = "Gyuun (Aquatic)", Photo = 12},
+[193] = {Name = "Gyuun (Forest)", Photo = 13},
+[194] = {Name = "Gyuun (Natural-2)", Photo = 14},
+[195] = {Name = "Diablos (Basic)", Photo = 171},
+[196] = {Name = "Diablos (Natural-1)", Photo = 172},
+[197] = {Name = "Diablos (Mountain)", Photo = 173},
+[198] = {Name = "Diablos (Grassland)", Photo = 174},
+[199] = {Name = "Diablos (Natural-2)", Photo = 175}
+}
 
 --Addresses I'm interested regarding speed version
 local Speed = {
@@ -143,6 +482,7 @@ Boss = 0x2888,
 Story = 0x4DD7,
 Music = 0x4AE2,	--Seems like it's the background music ID; can use this to check if in battle
 Counter = 0x0840,
+Win = 0x2870,
 Battle_Event_Timer = 0x2BA0,
 Battle_State = 0x2C16,
 Miss = 0x2C14,
@@ -166,6 +506,7 @@ Boss = 0x2898,
 Story = 0x4DE7,
 Music = 0x4AF2,
 Counter = 0x0850,
+Win = 0x2880,
 Battle_Event_Timer = 0x2BB0,
 Battle_State = 0x2C26,
 Miss = 0x2C24,
@@ -192,7 +533,7 @@ local function GetStats(addr,o)
 	o.special = memory.readbyte(addr+8)
 	o.nature = memory.readbyte(addr+10)
 	o.fd = memory.readbyte(addr+11)	--something to do with phones
-	o.ally = memory.readbyte(addr+21)	--something to do with phones
+	o.ally = memory.readbyte(addr+21)
 	o.attack1 = memory.readbyte(addr+22)
 	o.attack1_power = memory.readbyte(addr+23)
 	o.attack2 = memory.readbyte(addr+30)
@@ -261,15 +602,18 @@ function display_battle(address, toggle)
 		display_individual = (l_toggle > toggle_states["None"] and l_toggle < toggle_states["All"])
 		if display_individual then
 			if npc[l_toggle].exists then
-				line = "E"..l_toggle..Denjuu[npc[l_toggle].id].." ID:"..npc[l_toggle].id
+				line = "E"..l_toggle.." "..Denjuu[npc[l_toggle].id].Name.." ID:"..npc[l_toggle].id
 				gui.drawText(0,20,line,null,null,10,null,null)
-				line = "Ally:"..Denjuu[npc[l_toggle].ally].." ID:"..npc[l_toggle].ally
+				line = "Ally:"..Denjuu[npc[l_toggle].ally].Name.." ID:"..npc[l_toggle].ally
 				gui.drawText(0,30,line,null,null,10,null,null)
 				line = "LV:"..npc[l_toggle].level.." HP:"..npc[l_toggle].hp.."/"..npc[l_toggle].max_hp.." DP:"..npc[l_toggle].dp
 				gui.drawText(0,40,line,null,null,10,null,null)
 				line = "SPD:"..npc[l_toggle].speed.." ATK:"..npc[l_toggle].attack.." DEF:"..npc[l_toggle].defence.." SPEC:"..npc[l_toggle].special
 				gui.drawText(0,50,line,null,null,10,null,null)
-				line = Attacks[npc[l_toggle].attack1].." | "..Attacks[npc[l_toggle].attack2].."\n"..Attacks[npc[l_toggle].attack3].." | "..Attacks[npc[l_toggle].attack4]
+				line = Attacks[npc[l_toggle].attack1].Name.."("..npc[l_toggle].attack1..") P"..npc[l_toggle].attack1_power..
+				" | "..Attacks[npc[l_toggle].attack2].Name.."("..npc[l_toggle].attack2..") P"..npc[l_toggle].attack2_power..")\n"
+				..Attacks[npc[l_toggle].attack3].Name.."("..npc[l_toggle].attack3..") P"..npc[l_toggle].attack3_power..
+				" | "..Attacks[npc[l_toggle].attack4].Name.."("..npc[l_toggle].attack4..") P"..npc[l_toggle].attack4_power
 				gui.drawText(0,60,line,null,null,10,null,null)
 			end
 		end
@@ -283,15 +627,15 @@ function display_battle(address, toggle)
 					gui.drawText(0,20+(20*i),line,null,null,10,null,null)
 				end
 			end
+			gui.drawText(0,20,"Denjuu left:"..npc_count,null,null,10,null,null)
 		end
 	--Other things to display during a battle
-			gui.text(0,220,"Denjuu left:"..npc_count)
 			gui.text(0,235,"Battle State:"..battle_state.." DMG "..damage.."("..critical..")")
 			gui.text(0,250,"Battle timer:"..battle_timer)
 			gui.text(0,280,"BOSS: "..boss.." State: "..state)
 				--Just in case something happens that causes a non-move value to appear (healing for instance)
 		if Attacks[move_selected] ~= nil then
-			gui.text(0,265,"Move: "..Attacks[move_selected].." ("..move_selected..")")
+			gui.text(0,265,"Move: "..Attacks[move_selected].Name.." ("..move_selected..")")
 		else
 			gui.text(0,265,"Move: UNDEFINED ("..move_selected..")")
 		end
@@ -299,33 +643,41 @@ function display_battle(address, toggle)
 	return l_toggle
 end
 
-function display_overworld_npc(address)
+function display_overworld_npc(address,toggle)
+	local toggle_states = {["None"]=0,["View1"]=1,["View2"]=2}
 	local npc = {x,y,xcam,ycam,state}
 	local music
 	local num = 0	--For NPC
 	local overworld	--boolean
+	local addr
 	if address ~= nil then	--make sure address is valid
 		music = memory.readbyte(address.Music)
 	end
 	--Checking if overworld music is playing to display npc data
 	overworld = music ~= nil and (music >= 17 and music <= 43) or false
-	for i = (version() == "Power" and 0x34E0 or 0x34D0), 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
+	addr = (version() == "Power" and 0x34E0 or 0x34D0)
+	for i = addr, 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
 		if memory.readbyte(i) ~= 0 then
 			npc.xcam = memory.read_u16_le(i+2)
 			npc.ycam = memory.read_u16_le(i+4)
 			npc.x = string.format('%.1f',memory.read_u32_le(i+12)/65536.0)
 			npc.y = string.format('%.1f',memory.read_u32_le(i+16)/65536.0)
 			npc.state = memory.readbyte(i+31)
-			num = math.floor((i-0x34D0)/0x20)+1	--So it would be 1 offset
-			gui.drawText(npc.xcam-20,npc.ycam,"X"..npc.x.." Y"..npc.y.."s"..npc.state,null,null,10,null,null)
-			gui.drawText(npc.xcam-5,npc.ycam-20,num,null,null,10,null,null)
+			num = math.floor((i-addr)/0x20)+1	--So it would be 1 offset
+			if toggle == toggle_states["View1"] then
+				gui.drawText(npc.xcam-20,npc.ycam,"X"..npc.x.." Y"..npc.y.."s"..npc.state,null,null,10,null,null)
+				gui.drawText(npc.xcam-5,npc.ycam-20,num,null,null,10,null,null)
+			elseif toggle == toggle_states["View2"] then
+				gui.drawText(0,num*10,"X"..npc.x.." Y"..npc.y.."s"..npc.state.." #"..num,null,null,10,null,null)
+				gui.drawText(npc.xcam-5,npc.ycam-20,num,null,null,10,null,null)
+			end
 		end
 	end
 	gui.text(0,295,"NPCs: "..num)
 end
 
 function display_overworld(address,toggle)
-	local toggle_states = {["None"]=0,["NPC"]=1}
+	local toggle_states = {["None"]=0,["View1"]=1,["View2"]=2}
 	local l_toggle
 	local l_map
 	local x
@@ -334,6 +686,8 @@ function display_overworld(address,toggle)
 	local counter
 	local money
 	local music
+	local box_width = 45
+	local box_height = 10
 	--boolean
 	local in_overworld
 	local display_npc
@@ -347,16 +701,19 @@ function display_overworld(address,toggle)
 		music = memory.readbyte(address.Music)
 	end
 	l_toggle = (toggle ~= nil and toggle or toggle_states["None"])	--default value of 0
-		gui.drawText(0,150,"ON  OFF",null,null,10,null,null) --Click these for info
-		if (input.getmouse().Left and get_mouse_pos(0,150,24,10)) then
-			l_toggle = toggle_states["NPC"]
-		elseif (input.getmouse().Left and get_mouse_pos(24,150,24,10)) then
-			l_toggle = toggle_states["None"]
-		end
-	
 	
 	in_overworld = music ~= nil and (music >= 17 and music <= 43) or false
 	if in_overworld then
+	--only check toggle out of battle
+		gui.drawText(0,150,"View 1  View 2 OFF",null,null,10,null,null) --Click these for info
+		if (input.getmouse().Left and get_mouse_pos(0,150,box_width,box_height)) then
+			l_toggle = toggle_states["View1"]
+		elseif (input.getmouse().Left and get_mouse_pos(box_width,150,box_width,box_height)) then
+			l_toggle = toggle_states["View2"]
+		elseif (input.getmouse().Left and get_mouse_pos(box_width*2,150,box_width,box_height)) then
+			l_toggle = toggle_states["None"]
+		end
+		
 		gui.text(0,250,"X:"..string.format('%.6f',x/65536.0).." Y:"..string.format('%.6f',y/65536.0))
 		gui.text(0,265,"RNG:"..rng.." Counter:"..counter)
 		gui.text(0,280,"Music:"..music.." $:"..money)
@@ -364,9 +721,9 @@ function display_overworld(address,toggle)
 		if Map[l_map] ~= nil then
 			gui.text(0,235,Map[l_map].."("..l_map..")")
 		end
-		display_npc = (l_toggle == toggle_states["NPC"])
+		display_npc = (l_toggle ~= toggle_states["None"])
 		if display_npc then
-			display_overworld_npc(address)
+			display_overworld_npc(address,l_toggle)
 		end
 	end
 	return l_toggle
