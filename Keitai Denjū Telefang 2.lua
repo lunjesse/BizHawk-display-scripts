@@ -1,6 +1,6 @@
 memory.usememorydomain("IWRAM")
 
-local telefang_data = require 'telefang2 data'
+local telefang_data = require 'Keitai Denjū Telefang 2 data'
 local Speed = telefang_data.Speed
 local Power = telefang_data.Power
 local Attacks = telefang_data.Attacks
