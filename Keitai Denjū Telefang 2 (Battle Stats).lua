@@ -8,7 +8,7 @@ This script creates a text file that displays the following:
 * Which frame will the enemy choose which move
 This is for assisting making a TAS, and is completely useless in normal play
 ]]--
-local telefang_data = require 'telefang2 data'
+local telefang_data = require 'Keitai Denjū Telefang 2 data'
 local Speed = telefang_data.Speed
 local Power = telefang_data.Power
 local Attacks = telefang_data.Attacks
