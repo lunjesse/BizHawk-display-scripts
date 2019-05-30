@@ -8,6 +8,13 @@ This script creates a text file that displays the following:
 * Which frame will the enemy choose which move
 This is for assisting making a TAS, and is completely useless in normal play
 ]]--
+local telefang_data = require 'telefang2 data'
+local Speed = telefang_data.Speed
+local Power = telefang_data.Power
+local Attacks = telefang_data.Attacks
+local Denjuu = telefang_data.Denjuu
+local Items = telefang_data.Items
+local Map = telefang_data.Map
 
 --Check if power or speed version; they have addresses in different places
 function version()
@@ -20,100 +27,6 @@ function version()
 	end
 end
 
-local Picture_Book = {
-[0] = 15,[1] = 16,[2] = 17,[3] = 176,[4] = 177,[5] = 18,[6] = 19,[7] = 20,[8] = 21,[9] = 22,
-[10] = 23,[11] = 24,[12] = 25,[13] = 26,[14] = 27,[15] = 28,[16] = 29,[17] = 30,[18] = 31,[19] = 32,
-[20] = 37,[21] = 38,[22] = 39,[23] = 40,[24] = 33,[25] = 34,[26] = 35,[27] = 36,[28] = 41,[29] = 42,
-[30] = 43,[31] = 44,[32] = 45,[33] = 46,[34] = 47,[35] = 48,[36] = 49,[37] = 178,[38] = 179,[39] = 180,
-[40] = 50,[41] = 51,[42] = 52,[43] = 53,[44] = 54,[45] = 55,[46] = 56,[47] = 57,[48] = 58,[49] = 59,
-[50] = 60,[51] = 61,[52] = 62,[53] = 63,[54] = 64,[55] = 65,[56] = 66,[57] = 67,[58] = 68,[59] = 69,
-[60] = 70,[61] = 71,[62] = 72,[63] = 73,[64] = 74,[65] = 75,[66] = 76,[67] = 77,[68] = 78,[69] = 79,
-[70] = 80,[71] = 81,[72] = 82,[73] = 83,[74] = 84,[75] = 85,[76] = 86,[77] = 87,[78] = 181,[79] = 182,
-[80] = 183,[81] = 184,[82] = 185,[83] = 186,[84] = 187,[85] = 88,[86] = 89,[87] = 90,[88] = 188,[89] = 189,
-[90] = 190,[91] = 191,[92] = 192,[93] = 193,[94] = 91,[95] = 92,[96] = 93,[97] = 94,[98] = 194,[99] = 195,
-[100] = 95,[101] = 96,[102] = 97,[103] = 98,[104] = 99,[105] = 100,[106] = 101,[107] = 102,[108] = 103,[109] = 196,
-[110] = 197,[111] = 104,[112] = 105,[113] = 106,[114] = 107,[115] = 108,[116] = 109,[117] = 110,[118] = 111,[119] = 112,
-[120] = 113,[121] = 114,[122] = 115,[123] = 116,[124] = 117,[125] = 118,[126] = 119,[127] = 120,[128] = 121,[129] = 122,
-[130] = 123,[131] = 124,[132] = 125,[133] = 198,[134] = 199,[135] = 126,[136] = 127,[137] = 128,[138] = 129,[139] = 130,
-[140] = 131,[141] = 132,[142] = 133,[143] = 134,[144] = 135,[145] = 136,[146] = 137,[147] = 138,[148] = 139,[149] = 140,
-[150] = 141,[151] = 142,[152] = 143,[153] = 144,[154] = 145,[155] = 146,[156] = 147,[157] = 148,[158] = 149,[159] = 150,
-[160] = 151,[161] = 152,[162] = 153,[163] = 154,[164] = 155,[165] = 156,[166] = 157,[167] = 158,[168] = 159,[169] = 160,
-[170] = 161,[171] = 162,[172] = 163,[173] = 164,[174] = 165,[175] = 166,[176] = 167,[177] = 168,[178] = 169,[179] = 170,
-[180] = 0,[181] = 1,[182] = 2,[183] = 3,[184] = 4,[185] = 5,[186] = 6,[187] = 7,[188] = 8,[189] = 9,
-[190] = 10,[191] = 11,[192] = 12,[193] = 13,[194] = 14,[195] = 171,[196] = 172,[197] = 173,[198] = 174,[199] = 175}
-
---Attack names
-local Attacks = {
-[0] = "????",[1] = "Spark",[2] = "Falling Star",[3] = "Pillar of Fire",[4] = "Small Fire",[5] = "Will-o\'-the-Wisp",[6] = "Flame Shot",[7] = "Raging Fire",[8] = "Fire Wheel",[9] = "Disk Cutter",
-[10] = "Wheel",[11] = "Chainsaw",[12] = "Drill",[13] = "Rocket Punch",[14] = "Twin Drill",[15] = "Rotation Cutter",[16] = "Spiral Cutter",[17] = "Waterfall",[18] = "Soap Ball",[19] = "Water Drop",
-[20] = "Water Gun",[21] = "Wave Crash",[22] = "Squall",[23] = "Icicle Trap",[24] = "Watersprout",[25] = "Rock Claw",[26] = "Boulder Roll",[27] = "Sand Vortex",[28] = "Boulder Ball",[29] = "Boulder Avalanche",[30] = "Shake-Out",
-[31] = "Falling Rocks",[32] = "Small Quake",[33] = "Vaccum Cutter",[34] = "Shock Wave",[35] = "Whirlwind",[36] = "Gust",[37] = "Flap",[38] = "Tornado",[39] = "Gale",
-[40] = "Kamaitachi",[41] = "Ion Ball",[42] = "Positive Electricity",[43] = "Electric Claw",[44] = "Discharge",[45] = "Electric Shock",[46] = "Electric Arrow",[47] = "Big Electric Current",[48] = "Electric Field",[49] = "Claw",
-[50] = "Iron Claw",[51] = "Scales",[52] = "Ring",[53] = "Bite",[54] = "Beak",[55] = "Kicking",[56] = "Continuous Kicking",[57] = "Sabre",[58] = "Tail",[59] = "Suddenness (1)",
-[60] = "Suddenness (2)",[61] = "Jump",[62] = "Tentacle",[63] = "Numb Tentacle",[64] = "Body Blow",[65] = "Spit Spray",[66] = "Headbutt",[67] = "Suddenness (3)",[68] = "Horn",[69] = "Iron Horn",
-[70] = "Wing",[71] = "Thorn",[72] = "Rush",[73] = "Drain",[74] = "Bloodsuck",[75] = "Strike",[76] = "Razor Punch",[77] = "Hammer Punch",[78] = "Lick",[79] = "Needle",
-[80] = "Suddenness (4)",[81] = "Scissors",[82] = "Petal",[83] = "Feather Sabre",[84] = "Feather Knife",[85] = "Acupuncture",[86] = "Poison Sting",[87] = "Numbing Sting",[88] = "Hoof",[89] = "Suddenness (5)",
-[90] = "Suddenness (6)",[91] = "Whiplash",[92] = "Electric Wire",[93] = "Digestive Fluids",[94] = "Melting Fluids",[95] = "Stab",[96] = "Continuous Stab",[97] = "Ice Rock",[98] = "Big Wave",[99] = "Whirling Tides",
-[100] = "Ice Bullet",[101] = "Blizzard",[102] = "Big Water Pressure",[103] = "Big Tsunami",[104] = "Ion Beam",[105] = "Small Bolt",[106] = "Plasma Laser",[107] = "Lightning Strike",[108] = "Thunder Storm",[109] = "Mega Bolt",
-[110] = "Electric Hell",[111] = "Ibo Ibo Missile",[112] = "Gatling Gun",[113] = "Rapid-Fire Missile",[114] = "Bazooka",[115] = "Drill Missile",[116] = "Homing Missile",[117] = "Bombing",[118] = "Wave Attack",[119] = "Aura Wave",
-[120] = "Sandstorm",[121] = "Big Stream Pressure",[122] = "Vacuum Hole",[123] = "Hurricane",[124] = "Black Hole",[125] = "Heat Beam",[126] = "Small Burn",[127] = "Small Flame",[128] = "Flamethrower",[129] = "Fire Breath",
-[130] = "Big Burn",[131] = "Suddenness (7)",[132] = "Bomb Rock",[133] = "Small Rock",[134] = "Sand Prison",[135] = "Mega Quake",[136] = "Mega Rock",[137] = "Meteor Drop",[138] = "Diamond Rain",[139] = "Mushroom Bomb",
-[140] = "Egg Bomb",[141] = "Bomb",[142] = "Wave Beam",[143] = "Beam Light",[144] = "Blaster",[145] = "Suicide Attack",[146] = "String Discard",[147] = "Adhesive Liquid",[148] = "Smokescreen",[149] = "Flash",
-[150] = "Dust Cloud",[151] = "Recovery",[152] = "Big Recovery",[153] = "Shout",[154] = "Stare",[155] = "Glare",[156] = "Quick Step",[157] = "Speed Up",[158] = "Charging",[159] = "Big Charging",
-[160] = "Ultrasonic",[161] = "Curse Song",[162] = "Iron Defense",[163] = "Venom",[164] = "Poison Gas",[165] = "Numb Gas",[166] = "Cure",[167] = "Alarm Clock",[168] = "Roar",[169] = "Hot Wind",
-[170] = "Shrill Voice",[171] = "Cold Air",[172] = "Sleep Gas",[173] = "Lullaby",[174] = "Meditate",[175] = "Denma Barrier",[176] = "Persist",[177] = "Support",[178] = "Defense",[179] = "Shield",
-[180] = "Blessing",[181] = "Contemplate",[182] = "Hide",[183] = "Dive",[184] = "Skin Thicken",[185] = "Avoid",[186] = "Spore Shed",[187] = "Tongue Sticking Out",[188] = "Provoke",[189] = "Denma Seal",
-[190] = "Denma Drain",[191] = "Twister Song",[192] = "Energy Break",[193] = "Mega Break",[194] = "Count Down",[195] = "Strawberry Kiss",[196] = "Injection Plug",[197] = "Deflation Spiral",[198] = "Hot Bath",[199] = "Nove Smasher"}
-
---List of Denjuu by names, sorted by Index
-local Denjuu = {
-[0] = "Muscovy (Basic)",[1] = "Muscovy (Natural)",[2] = "Muscovy (Aquatic)",[3] = "Major (Basic)",[4] = "Major (Grassland)",[5] = "Fraby (Basic)",[6] = "Fraby (Mountain)",[7] = "Fraby (Sky)",[8] = "Kagu (Basic)",[9] = "Kagu (Natural)",
-[10] = "Purchera (Basic)",[11] = "Purchera (Sky)",[12] = "Purchera (Forest)",[13] = "Mentalis (Basic)",[14] = "Mentalis (Natural)",[15] = "Mentalis (Forest)",[16] = "Mentalis (Grassland)",[17] = "Karinota (Basic)",[18] = "Karinota (Grassland)",[19] = "Karinota (Mountain)",
-[20] = "Chukar (Basic)",[21] = "Chukar (Natural)",[22] = "Chukar (Mountain)",[23] = "Chukar (Aquatic)",[24] = "Laperouse (Basic)",[25] = "Laperouse  (Natural)",[26] = "Laperouse (Desert)",[27] = "Laperouse (Grassland)",[28] = "Anpipitto (Basic)",[29] = "Anpipitto (Sky)",
-[30] = "Anpipitto (Desert)",[31] = "Ruficors (Basic)",[32] = "Ruficors (Grassland)",[33] = "Ruficors (Aquatic)",[34] = "Cotta (Basic)",[35] = "Cotta (Natural)",[36] = "Cotta (Desert)",[37] = "Rupicola (Basic)",[38] = "Rupicola (Grassland)",[39] = "Rupicola (Sky)",
-[40] = "Willcock (Basic)",[41] = "Willcock (Natural)",[42] = "Willcock (Forest)",[43] = "Skrippa (Basic)",[44] = "Skrippa (Aquatic)",[45] = "Cabot (Basic)",[46] = "Cabot (Natural)",[47] = "Makyuretto (Basic)",[48] = "Makyuretto (Natural)",[49] = "Makyuretto (Grassland)",
-[50] = "Makyuretto (Forest)",[51] = "Coronet (Basic)",[52] = "Coronet (Aquatic)",[53] = "Coronet (Grassland)",[54] = "Tataupa (Basic)",[55] = "Tataupa (Desert)",[56] = "Tataupa (Forest)",[57] = "Chigomozu (Basic)",[58] = "Chigomozu (Natural)",[59] = "Koikaru (Basic)",
-[60] = "Koikaru (Natural)",[61] = "Koikaru (Forest)",[62] = "Pewee (Basic)",[63] = "Pewee (Natural)",[64] = "Pewee (Aquatic)",[65] = "Pewee (Mountain)",[66] = "Chapmani (Basic)",[67] = "Chapmani (Natural)",[68] = "Hyuming (Basic)",[69] = "Hyuming (Natural)",
-[70] = "Hyuming (Mountain)",[71] = "Pamirio (Basic)",[72] = "Pamirio (Natural)",[73] = "Pamirio (Sky)",[74] = "Pamirio (Desert)",[75] = "Mistashi (Basic)",[76] = "Mistashi (Forest)",[77] = "Mistashi (Aquatic)",[78] = "Parrotto (Basic)",[79] = "Parrotto (Natural)",
-[80] = "Nebularia (Basic)",[81] = "Nebularia (Natural)",[82] = "Granti (Basic)",[83] = "Granti (Nautral)",[84] = "Granti (Desert)",[85] = "Penelope (Basic)",[86] = "Penelope (Aquatic)",[87] = "Penelope (Mountain)",[88] = "Ardea (Basic)",[89] = "Ardea (Natural)",
-[90] = "Ardea (Forest)",[91] = "Cerator (Basic)",[92] = "Cerator (Natural)",[93] = "Cerator (Mountain)",[94] = "Alpina (Basic)",[95] = "Alpina (Natural)",[96] = "Alpina (Aquatic)",[97] = "Alpina (Sky)",[98] = "Isuka (Basic)",[99] = "Isuka (Grassland)",
-[100] = "Bicolour (Basic)",[101] = "Bicolour (Natural)",[102] = "Hermit (Basic)",[103] = "Hermit (Natural)",[104] = "Hermit (Desert)",[105] = "Hermit (Grassland)",[106] = "Phoebe (Basic)",[107] = "Phoebe (Aquatic)",[108] = "Phoebe (Desert)",[109] = "Blossom (Basic)",
-[110] = "Blossom (Mountain)",[111] = "Rabricol (Basic)",[112] = "Rabricol (Natural)",[113] = "Rabricol (Aquatic)",[114] = "Demerus (Basic)",[115] = "Demerus (Natural)",[116] = "Demerus (Desert)",[117] = "Sparsa (Basic)",[118] = "Sparsa (Natural)",[119] = "Sparsa (Forest)",
-[120] = "Purprea (Basic)",[121] = "Purprea (Sky)",[122] = "Purprea (Grassland)",[123] = "Etopirika (Basic)",[124] = "Etopirika (Natural)",[125] = "Etopirika (Forest)",[126] = "Regulus (Basic)",[127] = "Regulus (Desert)",[128] = "Regulus (Sky)",[129] = "Akretto (Basic)",
-[130] = "Akretto (Natural)",[131] = "Akretto (Grassland)",[132] = "Akretto (Mountain)",[133] = "Seiran (Basic)",[134] = "Seiran (Mountain)",[135] = "Tectus (Basic)",[136] = "Tectus (Natural)",[137] = "Serrata (Basic)",[138] = "Serrata (Sky)",[139] = "Serrata (Forest)",
-[140] = "Kaya (T2)",[141] = "Beebalm (T2)",[142] = "Easydog (T2)",[143] = "Ruscus (T2)",[144] = "Ryuuguu (T2)",[145] = "Kanzou (T2)",[146] = "Ornithogalum (T2)",[147] = "Teletel (T2)",[148] = "Dendel (T2)",[149] = "Suguri (T2)",
-[150] = "Suguline (T2)",[151] = "Saiguliger (T2)",[152] = "Punica (T2)",[153] = "Punisto (T2)",[154] = "Oshe (T2)",[155] = "Barriarm (T2)",[156] = "Bashou (T2)",[157] = "Gentiana (T2)",[158] = "Gonum (T2)",[159] = "Gust (T2)",
-[160] = "Storm (T2)",[161] = "Tsunonasu (T2)",[162] = "Gigagigearth (T2)",[163] = "Liriope (T2)",[164] = "Lirimonarch (T2)",[165] = "Waratah (T2)",[166] = "Enteiou (T2)",[167] = "Gumi (T2)",[168] = "Gymnos (T2)",[169] = "Gymbaron (T2)",
-[170] = "Gymzyrus (T2)",[171] = "Gymzatan (T2)",[172] = "Angios (T2)",[173] = "Angigorgo (T2)",[174] = "Angipower (T2)",[175] = "Angioros (T2)",[176] = "Fungus (T2)",[177] = "Fungwar (T2)",[178] = "Funboost (T2)",[179] = "Funblade (T2)",
-[180] = "Rex (Basic)",[181] = "Rex (Natural-1)",[182] = "Rex (Desert)",[183] = "Rex (Forest)",[184] = "Rex (Natural-2)",[185] = "Doon (Basic)",[186] = "Doon (Natural-1)",[187] = "Doon (Sky)",[188] = "Doon (Aquatic)",[189] = "Doon (Natural-2)",
-[190] = "Gyuun (Basic)",[191] = "Gyuun (Natural-1)",[192] = "Gyuun (Aquatic)",[193] = "Gyuun (Forest)",[194] = "Gyuun (Natural-2)",[195] = "Diablos (Basic)",[196] = "Diablos (Natural-1)",[197] = "Diablos (Mountain)",[198] = "Diablos (Grassland)",[199] = "Diablos (Natural-2)"}
-
---Addresses I'm interested regarding speed version
-local Speed = {
-Music = 0x4AE2,	--Seems like it's the background music ID; can use this to check if in battle
-Counter = 0x0840,
-Battle_State = 0x2C16,
-Miss = 0x2C14,
-Crit = 0x2C22,
-Move = 0x2B06,
-Damage = 0x2A0B,
-RNG1 = 0x5E08,
-RNG2 = 0x5E10
-}
-
---Addresses I'm interested regarding power version
-local Power = {
-Music = 0x4AF2,
-Counter = 0x0850,
-Battle_State = 0x2C26,
-Miss = 0x2C24,
-Crit = 0x2C32,
-Move = 0x2B16,
-Damage = 0x2A1B,
-RNG1 = 0x5E18,
-RNG2 = 0x5E20
-}
-
 local framelimit = 500
 --[[
 Since its determined as 
@@ -124,8 +37,10 @@ Since its determined as
 in that order, all separately, it makes more sense to have a toggle rather than record all 4
 Toggle parameters are Crit, Moves, Miss, or Ally
 ]]--
-local toggle = {[5]="Crit",[36]="Moves",[63]="Miss",[31]="Ally"}
---In Hex, the above is 0x5, 0x24, 0x3F, 0x1F respectively
+local toggle = {[5]="Crit",[31]="Ally",[36]="Moves",[63]="Miss"}
+--for readability later
+local value_names = {["Crit"] = 5, ["Ally"] = 31, ["Moves"] = 36, ["Miss"] = 63}
+--In Hex, the above is 0x5, 0x1F, 0x24, 0x3F,  respectively
 while true do
 local Addresses
 local RNG1 
@@ -140,7 +55,7 @@ while version() ~= "NA" do
 		RNG2 = memory.read_u32_le(Addresses.RNG2)
 		if toggle[State] == nil then
 			console.log("Please start the script at the states 5, 31, 36 or 63")
-			console.log("In Hex, the above is 0x5, 0x24, 0x1F, 0x3F respectively")
+			console.log("In Hex, the above is 0x5, 0x1F, 0x24, 0x3F respectively")
 			console.log("RNG is:")
 			console.log(memory.read_u32_le(0x5E08).."\t"..memory.read_u32_le(0x5E10))
 			client.pause()
@@ -155,7 +70,7 @@ while version() ~= "NA" do
 				io.output(file)
 				io.write("Frames\tCounter\tDamage\tCrit\r\n")
 				for i = 0, framelimit do
-					memory.writebyte(Addresses.Battle_State,5)	--To keep it at 5
+					memory.writebyte(Addresses.Battle_State,value_names["Crit"])	--To keep it at 5
 					memory.write_u32_le(Addresses.RNG1,RNG1)
 					memory.write_u32_le(Addresses.RNG2,RNG2)
 					crit = (memory.readbyte(Addresses.Crit) == 1 and "Yes" or "No")
@@ -168,7 +83,7 @@ while version() ~= "NA" do
 				io.output(file)
 				io.write("Frames\tCounter\tMove\r\n")
 				for i = 0, framelimit do
-					memory.writebyte(Addresses.Battle_State,0x24)	--To keep it at 0x24
+					memory.writebyte(Addresses.Battle_State,value_names["Moves"])	--To keep it at 0x24
 					memory.write_u32_le(Addresses.RNG1,RNG1)
 					memory.write_u32_le(Addresses.RNG2,RNG2)
 					if (memory.readbyte(Addresses.Move) > 199) then
@@ -184,7 +99,7 @@ while version() ~= "NA" do
 				io.output(file)
 				io.write("Frames\tCounter\tMiss\tValue\r\n")
 				for i = 0, framelimit do
-					memory.writebyte(Addresses.Battle_State,0x3F)	--To keep it at 0x3F
+					memory.writebyte(Addresses.Battle_State,value_names["Miss"])	--To keep it at 0x3F
 					memory.write_u32_le(Addresses.RNG1,RNG1)
 					memory.write_u32_le(Addresses.RNG2,RNG2)
 					if (memory.readbyte(Addresses.Miss) == 61) then
@@ -203,7 +118,7 @@ while version() ~= "NA" do
 				io.output(file)
 				io.write("Frames\tCounter\tAlly\tValue\r\n")
 				for i = 0, framelimit do
-					memory.writebyte(Addresses.Battle_State,0x1F)	--To keep it at 0x1F, or else it goes away
+					memory.writebyte(Addresses.Battle_State,value_names["Ally"])	--To keep it at 0x1F, or else it goes away
 					--press A once in 0x1F to get 0x88, then another frame to find result
 					savestate.saveslot(1)
 					joypad.set({A = 1})
