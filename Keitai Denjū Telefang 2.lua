@@ -1,6 +1,6 @@
 memory.usememorydomain("IWRAM")
 
-local telefang_data = require 'Keitai Denjū Telefang 2 data'
+local telefang_data = require 'telefang2 data'
 local Speed = telefang_data.Speed
 local Power = telefang_data.Power
 local Attacks = telefang_data.Attacks
@@ -84,7 +84,7 @@ function display_battle(address, toggle)
 	local npc_present
 	local offset
 	if address ~= nil then	--make sure address is valid
-		in_battle = (memory.readbyte(address.Music) >= 5 and memory.readbyte(address.Music) <= 9)	--checking music to see if in battle
+		in_battle = (memory.readbyte(address.Game_State) == 5)
 		battle_state = memory.readbyte(address.Battle_State)
 		battle_timer = memory.readbyte(address.Battle_Event_Timer)
 		damage = memory.readbyte(address.Damage)
@@ -192,15 +192,15 @@ end
 function display_overworld_npc(address,toggle)
 	local toggle_states = {["None"]=0,["View1"]=1,["View2"]=2}
 	local npc = {x,y,xcam,ycam,state}
-	local music
+	local game_state
 	local num = 0	--For NPC
 	local overworld	--boolean
 	local addr
 	if address ~= nil then	--make sure address is valid
-		music = memory.readbyte(address.Music)
+		game_state = memory.readbyte(address.Game_State)
 	end
 	--Checking if overworld music is playing to display npc data
-	overworld = music ~= nil and (music >= 17 and music <= 43) or false
+	overworld = game_state ~= nil and (game_state == 10) or false
 	addr = (version() == "Power" and 0x34E0 or 0x34D0)
 	for i = addr, 0x3810, 0x20 do	--Power and Speed is offsetted by +0x10 difference
 		if memory.readbyte(i) ~= 0 then
@@ -232,6 +232,7 @@ function display_overworld(address,toggle)
 	local counter
 	local money
 	local music
+	local game_state
 	local box_width = 9
 	local box_height = 9
 	--boolean
@@ -244,11 +245,12 @@ function display_overworld(address,toggle)
 		rng = memory.read_u32_le(address.RNG1)
 		counter = memory.read_u32_le(address.Counter)
 		money = memory.read_u32_le(address.Money)
+		game_state = memory.readbyte(address.Game_State)
 		music = memory.readbyte(address.Music)
 	end
 	l_toggle = (toggle ~= nil and toggle or toggle_states["None"])	--default value of 0
 	
-	in_overworld = music ~= nil and (music >= 17 and music <= 43) or false
+	in_overworld = game_state ~= nil and (game_state == 10) or false
 	if in_overworld then
 	--only check toggle out of battle
 		local box_x = 58
