@@ -1,25 +1,6 @@
 local hex = bizstring.hex
 console.clear()
---r0:00000003 r1:02004B40 r2:000014BC r3:00000000 r4:02019690 r5:00000000 r6:00000000 r7:02005FE0 r8:00000000 r9:00000000 r10:00000000 r11:00000000 r12:02003B10 r13:03007BF4 r14:08004BA7 r15:080056CA r16:6000003F
-r = {}
-r[0] = 0x00000003
-r[1] = 0x02004B40
-r[2] = 0x000014BC
-r[3] = 0
-r[4] = 0x02019690
-r[5] = 0
-r[6] = 0
-r[7] = 0x02005FE0
-r[8] = 0
-r[9] = 0
-r[10] = 0
-r[11] = 0
-r[12] = 0x02003B10 
-r[13] = 0x03007BF4
-r[14] = 0x08004BA7
-r[15] = 0x080056CA 
-r[16] = 0x6000003F
-r.CPSR = 0x6000003F
+
 --Credits: http://lua-users.org/wiki/SimpleStack
 -- GLOBAL
 Stack = {}
@@ -447,43 +428,69 @@ function asm_080109C1(registers, stack, stuff)
 	r[0] = r[0] + r[1]	--0800570D
 	r[0] = load_biz_addr(r[0], 32)	--0800570F; doing this for now until I figure out memory things
 	r[0] = r[0] + r[3]				--08005713; egg address
+	stuff.egg_address = r[0]	-- record it just in case
 	r[0] = load_biz_addr(r[0], 8)	--08005715; egg id from ROM
-	
+	stuff.egg_id = r[0]			-- record it just in case
 	return r, stack, stuff
 end
 stack = Stack:Create()
 
 local stuff = {}	--placeholder for memory address values
--- stuff.floor_number = 7
--- stuff.RNG = 0x700B
--- stuff.dungeon = "B"
---Fire Fog A F7
-stuff.floor_number = 7
-stuff.RNG = 0xCFD3
-stuff.dungeon = "A"
-stuff.addr_44A0 = {A = 0x0817636C, B = 0x0817210C}
-stuff.addr_0817210C = {B = 0x081720DC}
-stuff.type = 2	--seems to range from 0 to 4 (address 0x6056, EWRAM; displayed type value)
+
+function egg_predict(rng, dungeon, egg_type, dg_floor)
+	stuff = {}
+	stuff.floor_number = dg_floor	--which floor?
+	stuff.RNG = rng	--RNG value
+	stuff.dungeon = dungeon	--A or B
+	stuff.addr_44A0 = {A = 0x0817636C, B = 0x0817210C}
+	stuff.type = egg_type
+	stuff.egg_address = 0
+	--r0:00000003 r1:02004B40 r2:000014BC r3:00000000 r4:02019690 r5:00000000 r6:00000000 r7:02005FE0 r8:00000000 r9:00000000 r10:00000000 r11:00000000 r12:02003B10 r13:03007BF4 r14:08004BA7 r15:080056CA r16:6000003F
+	r = {}
+	r[0] = 0x00000003
+	r[1] = 0x02004B40
+	r[2] = 0x000014BC
+	r[3] = 0
+	r[4] = 0x02019690
+	r[5] = 0
+	r[6] = 0
+	r[7] = 0x02005FE0
+	r[8] = 0
+	r[9] = 0
+	r[10] = 0
+	r[11] = 0
+	r[12] = 0x02003B10 
+	r[13] = 0x03007BF4
+	r[14] = 0x08004BA7
+	r[15] = 0x080056CA 
+	r[16] = 0x6000003F
+	r.CPSR = 0x6000003F
+	--080056CB
+	r[0] = 60
+	--080056CD, 080056CF
+	r[14] = 0x080056CF
+	r[15] = 0x080109AE
+	r, stack = asm_080109AF(r, stack)
+	r, stack, stuff.RNG = next_rng(r, stack, stuff.RNG)
+	r, stack = asm_080109B7(r, stack)	--This should call either asm_08059BD5 or asm_08059B23; both end up with egg function
+	r, stack, stuff = asm_080109C1(r, stack, stuff)
+	-- display_registers(r)
+	-- console.log("Stack now")
+	-- stack:list()
+	return stuff.egg_id, stuff.egg_address
+end
+
 --[[
+Types:
 0	Electric
 1	Water
 2	Fire
 3	Earth
 4	Royal (doesn't appear in wild)
 ]]--
-stuff.addr_817210C = {
-
-}
---080056CB
-r[0] = 60
---080056CD, 080056CF
-r[14] = 0x080056CF
-r[15] = 0x080109AE
-r, stack = asm_080109AF(r, stack)
-r, stack, stuff.RNG = next_rng(r, stack, stuff.RNG)
-r, stack = asm_080109B7(r, stack)	--This should call either asm_08059BD5 or asm_08059B23; both end up with egg function
-
-r, stack, stuff = asm_080109C1(r, stack, stuff)
-display_registers(r)
-console.log("Stack now")
-stack:list()
+local egg_id, egg_address = egg_predict(0xCFD3, "A", 2, 7)
+console.log("Egg ID: "..egg_id.." (0x"..hex(egg_id)..")")
+console.log("Egg Address: 0x0"..hex(egg_address))
+egg_id, egg_address = egg_predict(0x700B, "B", 0, 7)
+console.log("Egg ID: "..egg_id.." (0x"..hex(egg_id)..")")
+console.log("Egg Address: 0x0"..hex(egg_address))
