@@ -195,6 +195,8 @@ function display_npc(base, x, y, camx, camy)
 	end
 end
 
+local X_TILES, Y_TILES = 12, 12
+
 local game_address, game_tiles
 while true do
 	if memory.read_u16_le(0x000134, "ROM") == 0x4743 then
@@ -230,10 +232,10 @@ while true do
 		gettile = gettile_fast
 	end
 
+	local curr_tiles, tile_colors = {}, {}
 	local x_offset, y_offset = x - camx - 1, y - camy - 1
-	local drawx, drawy
-	for i = 0, 18, 1 do
-		for j = 0, 18, 1 do
+	for i = 0, X_TILES - 1, 1 do
+		for j = 0, Y_TILES - 1, 1 do
 			-- ttype = gettile(x_offset + 16 * i, y_offset + 16 * j)
 			ttype = tileid(gettile(x_offset + 16 * i, y_offset + 16 * j))
 			if (ttype ~= 0x47ab)
@@ -241,11 +243,39 @@ while true do
 			and not ((ttype >= 0x4e29) and (ttype <= 0x4e39))
 			and not ((ttype >= 0x5400) and (ttype <= 0x54ff)) then
 			--if (ttype~=0x47ab) and (ttype~=0x4cf3) and (ttype~=0x4cef) and (ttype~=0x4d03) and (ttype~=0x4cff) and (ttype~=0x4e29) and (ttype~=0x4e35) and (ttype~=0x4f3a) then
+				curr_tiles[i * X_TILES + j] = game_tiles[ttype]
+				tile_colors[i * X_TILES + j] = tiles.colors[game_tiles[ttype]] or "RED"
+			end
+		end
+	end
 
-				tcolor = tiles.colors[game_tiles[ttype]] or "RED"
-				drawx = (camx - x) % 16 - 8 + 16 * i
-				drawy = (camy - y) % 16 - 16 + 16 * j
-				gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
+	local drawx, drawy
+	for i = 0, X_TILES - 1, 1 do
+		for j = 0, Y_TILES - 1, 1 do
+			tcolor = tile_colors[i * X_TILES + j]
+			if tcolor ~= nil then
+				drawx = (camx - x) % 16 - 24 + 16 * i
+				drawy = (camy - y) % 16 - 32 + 16 * j
+				-- Original drawing method
+				-- gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
+
+				curr_tile = curr_tiles[i * X_TILES + j]
+				if j == 0 or curr_tile ~= curr_tiles[i * X_TILES + (j - 1)] then
+					-- Top
+					gui.drawLine(drawx, drawy, drawx + 15, drawy, tcolor)
+				end
+				if i == X_TILES - 1 or curr_tile ~= curr_tiles[(i + 1) * X_TILES + j] then
+					-- Right
+					gui.drawLine(drawx + 15, drawy, drawx + 15, drawy + 15, tcolor)
+				end
+				if j == Y_TILES - 1 or curr_tile ~= curr_tiles[i * X_TILES + (j + 1)] then
+					-- Bottom
+					gui.drawLine(drawx, drawy + 15, drawx + 15, drawy + 15, tcolor)
+				end
+				if i == 0 or curr_tile ~= curr_tiles[(i - 1) * X_TILES + j] then
+					-- Left
+					gui.drawLine(drawx, drawy, drawx, drawy + 15, tcolor)
+				end
 			end
 		end
 	end
