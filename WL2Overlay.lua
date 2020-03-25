@@ -1,5 +1,6 @@
 -- Original source: http://tasvideos.org/userfiles/info/19833044932372339
 -- By Slamo, with modifications from me and mugg
+-- Additional improvements by RetroEdit
 memory.usememorydomain("WRAM")
 local x, y, camx, camy, tref, ttype, ttypehigh, tcolor, warpdest
 local address = {
@@ -142,38 +143,35 @@ local tiles = {
 	}
 }
 
+lshift, band, rshift = bit.lshift, bit.band, bit.rshift
 
-function bitswap (swappy)
-	nib2 = bit.band(swappy,0xF)
-	return (nib2*0x10+bit.rshift(swappy,4))
+function gettile_accurate (wx, wy)
+	-- Not the final location! Can vary if above 0xA000
+	return lshift(band(band(rshift(wy, 4), 0xFF) + 0xA0, 0xFF), 8) + band(rshift(wx, 4), 0xFF)
+	-- Old comment:
+	-- return (bit.band(0x2000 + 0x100*math.floor(wy/16+1) + math.floor(wx/16), 0x7FFF)) works for most space, not glitch rooms
 end
 
-function gettile (wx,wy)
-	hix = bit.rshift(bit.band(0xFF00,wx),8)
-	hiy = bit.rshift(bit.band(0xFF00,wy),8)
-	lox = bit.band(0xFF,wx)
-	loy = bit.band(0xFF,wy)
-	ccea = bit.band(bitswap(bit.band(hiy,0x0F))+bit.band(bitswap(loy),0x0F)+0xA0,0xFF)
-	cceb = bitswap(bit.band(hix,0x0F))+bit.band(bitswap(lox),0x0F)
-	rawloc = ccea*0x100+cceb -- not the final location!!! can vary if above 0xa000
-	return (rawloc)
-	-- return (bit.band(0x2000 + 0x100*math.floor(wy/16+1) + math.floor(wx/16),0x7FFF)) works for most space, not glitch rooms
+function gettile_fast (wx, wy)
+	-- The following may not work for glitch rooms:
+	return lshift(band(rshift(wy, 4) + 0xA0, 0xFF), 8) + rshift(wx, 4)
 end
 
 function tileid (ntile)
+	local realloc, tlookup
 	if (ntile >= 0xa000) then
 		realloc = ntile - 0x8000
-		tlookup = memory.readbyte(realloc,'CartRAM') -- where normal level data is
+		tlookup = memory.readbyte(realloc, 'CartRAM') -- where normal level data is
 	else
 		realloc = ntile
-		tlookup = memory.readbyte(realloc,'System Bus')
+		tlookup = memory.readbyte(realloc, 'System Bus')
 	end
-	local address = 0x7c002+tref+bit.band(tlookup*2,0xFF)
-	local result = memory.read_u16_le(address,'ROM')
+	local address = 0x7c002 + tref + bit.band(tlookup * 2, 0xFF)
+	local result = memory.read_u16_le(address, 'ROM')
 	-- -- if result == 0x4f60 then 
 	-- if result == 0x4f3a then 
-		-- -- memory.write_u16_le(address,0x4f3a)
-		-- memory.write_u16_le(address,0x4f60)
+		-- -- memory.write_u16_le(address, 0x4f3a)
+		-- memory.write_u16_le(address, 0x4f60)
 	-- end
 	return result
 end
@@ -182,63 +180,81 @@ end
 -- Written by mugg, modified by me to use WRAM instead.
 function display_npc(base, x, y, camx, camy)
 	for i = base, base+0xFF, 32 do
-		 if memory.readbyte(i+0) > 0 then	--coins grabbed seems to make it 2 or 3
+		-- Coins grabbed seems to make it 2 or 3
+		if memory.readbyte(i+0) > 0 then
 			local xenemy = memory.read_u16_le(i+5)
 			local yenemy = memory.read_u16_le(i+3)
 			local id = memory.readbyte(i+9)
 			local ecamx = (xenemy-x)+camx
 			local ecamy = (yenemy-y)+camy
-			gui.drawBox(ecamx-16,ecamy-32,ecamx,ecamy-16,0x8611759E)
-			gui.pixelText(ecamx-16,ecamy-39,id)
-			gui.pixelText(ecamx-16,ecamy-32,"X:"..xenemy)
-			gui.pixelText(ecamx-16,ecamy-25,"Y:"..xenemy)
+			gui.drawBox(ecamx-16, ecamy-32, ecamx, ecamy-16, 0x8611759E)
+			gui.pixelText(ecamx-16, ecamy-39, id)
+			gui.pixelText(ecamx-16, ecamy-32, "X:" .. xenemy)
+			gui.pixelText(ecamx-16, ecamy-25, "Y:" .. xenemy)
 		end
 	end
 end
 
-local game_address = address.gbc
-local game_tiles = tiles.gbc
-
+local game_address, game_tiles
 while true do
-	if memory.read_u16_le(0x000134, "ROM") == 0x4743 then --ROM says CGB
+	if memory.read_u16_le(0x000134, "ROM") == 0x4743 then
+		-- ROM says CGB
 		game_address = address.gbc
 		game_tiles = tiles.gbc
 	else
 		game_address = address.gb
 		game_tiles = tiles.gb
 	end
-	x = mainmemory.read_u16_be(game_address.x) -- position in level
+
+	-- position in level
+	x = mainmemory.read_u16_be(game_address.x)
 	y = mainmemory.read_u16_be(game_address.y)
-	camx = mainmemory.readbyte(game_address.camx) -- position relative to upper left camera edge
+
+	-- position relative to upper left camera edge
+	camx = mainmemory.readbyte(game_address.camx)
 	camy = mainmemory.readbyte(game_address.camy)
+
 	tref = mainmemory.read_u16_be(game_address.tref)
 	stageid = memory.readbyte(game_address.stageid)
 	display_npc(game_address.npc_base, x, y, camx, camy)
+
 	-- warpdest = mainmemory.readbyte(game_address.warpdest) -- sector coordinates for a warp (??)
 	-- 160x144
-	-- gui.drawText(3,130,string.format("%X",bit.rshift(warpdest,4))..' '..string.format("%X",bit.band(warpdest,0xF)))
-	for i = -1,17,1 do
-		for j = -1,17,1 do
-			ttype = tileid(gettile(x-camx+15+16*i,y-camy+15+16*j))
-			ttypehigh = bit.band(ttype,0xFF00)
-			if (ttype~=0x47ab) and (ttype~=0x49a7) and not ((ttype>=0x4e29) and (ttype<=0x4e39)) and not ((ttype>=0x5400) and (ttype<=0x54ff)) then
+	-- gui.drawText(3, 130, string.format("%X", bit.rshift(warpdest, 4)) .. ' ' .. string.format("%X", bit.band(warpdest, 0xF)))
+
+	if (x - camx + 15 + 16 * 17) > 0xFFF or (y - camy + 15 + 16 * 17) > 0xFFF then
+		console.log("Tile coords outside of assumed range: (x: " .. x .. ", camx: " .. camx .. ", y: " .. y .. ", camy: " .. camy .. ")")
+		gettile = gettile_accurate
+		client.pause()
+	else
+		gettile = gettile_fast
+	end
+
+	local x_offset, y_offset = x - camx - 1, y - camy - 1
+	local drawx, drawy
+	for i = 0, 18, 1 do
+		for j = 0, 18, 1 do
+			-- ttype = gettile(x_offset + 16 * i, y_offset + 16 * j)
+			ttype = tileid(gettile(x_offset + 16 * i, y_offset + 16 * j))
+			if (ttype ~= 0x47ab)
+			and (ttype ~= 0x49a7)
+			and not ((ttype >= 0x4e29) and (ttype <= 0x4e39))
+			and not ((ttype >= 0x5400) and (ttype <= 0x54ff)) then
 			--if (ttype~=0x47ab) and (ttype~=0x4cf3) and (ttype~=0x4cef) and (ttype~=0x4d03) and (ttype~=0x4cff) and (ttype~=0x4e29) and (ttype~=0x4e35) and (ttype~=0x4f3a) then
-				-- if (ttype==0x4ecd) or (ttype==0x4edb) or (ttype==0x4f3a) or (ttype==0x4f60) then -- door, minigame, exit
-					-- tcolor = 'GREEN' 
-				if game_tiles[ttype] ~= nil then
-					tcolor = tiles.colors[game_tiles[ttype]]
-					tcolor = (tcolor ~= nil) and tcolor or "RED"
-				end
-				gui.drawBox((camx-x)%16-8+16*i,(camy-y)%16-16+16*j,(camx-x)%16+7+16*i,(camy-y)%16+16*j-1,tcolor)
+
+				tcolor = tiles.colors[game_tiles[ttype]] or "RED"
+				drawx = (camx - x) % 16 - 8 + 16 * i
+				drawy = (camy - y) % 16 - 16 + 16 * j
+				gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
 			end
 		end
 	end
-	gui.drawText(3,3,string.format("%X",gettile(x,y-32))..' '..string.format("%X",tileid(gettile(x,y-32))))
-	gui.drawText(3,12,string.format("%X",gettile(x,y-16))..' '..string.format("%X",tileid(gettile(x,y-16))))
-	gui.drawText(3,21,string.format("%X",gettile(x,y))..' '..string.format("%X",tileid(gettile(x,y))),"BLACK","BLACK")
-	gui.drawText(4,22,string.format("%X",gettile(x,y))..' '..string.format("%X",tileid(gettile(x,y))))
-	gui.drawText(3,31,"X:"..x.." Y:"..y,"BLACK","BLACK")
-	gui.drawText(4,32,"X:"..x.." Y:"..y,"WHITE")
-	gui.drawText(3,40,"Stage:"..stageid)
+
+	local x_start = 26
+	gui.pixelText(0, x_start, string.format("%X", gettile(x, y-32)) .. ' ' .. string.format("%X", tileid(gettile(x, y-32))), "WHITE", "BLACK")
+	gui.pixelText(0, x_start + 7, string.format("%X", gettile(x, y-16)) .. ' ' .. string.format("%X", tileid(gettile(x, y-16))), "WHITE", "BLACK")
+	gui.pixelText(0, x_start + 7 * 2, string.format("%X", gettile(x, y)) .. ' ' .. string.format("%X", tileid(gettile(x, y))), "WHITE", "BLACK")
+	gui.pixelText(0, x_start + 7 * 3, "X:" .. x .. " Y:" .. y, "WHITE", "BLACK")
+	gui.pixelText(0, x_start + 7 * 4, "Stage:" .. stageid, "WHITE", "BLACK")
 	emu.frameadvance()
 end
