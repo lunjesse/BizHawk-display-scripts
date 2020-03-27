@@ -6,22 +6,24 @@ local x, y, camx, camy, tref, ttype, ttypehigh, tcolor, warpdest
 local address = {
 	gbc = {
 		npc_base = 0x0000,
-		x = 0x153c,
-		y = 0x153a,
 		camx = 0x660,
 		camy = 0x65f,
+		game_state = 0x6f1,
 		tref = 0x704,
 		warpdest = 0xa1,
-		stageid = 0x1510
+		stageid = 0x1510,
+		x = 0x153c,
+		y = 0x153a
 	},
 	gb = {
+		stageid = 0x0510,
 		x = 0x053c,
 		y = 0x053a,
 		npc_base = 0x1000,
 		camx = 0x1652,
 		camy = 0x1651,
-		tref = 0x16EB,
-		stageid = 0x0510
+		game_state = 0x16D8,
+		tref = 0x16EB
 	}
 }
 
@@ -106,6 +108,8 @@ local tiles = {
 		[0x4d9f] = "Breakable",
 		[0x4d95] = "Breakable (NPC)", --throw npcs to destroy them
 		[0x4d99] = "Breakable (NPC)", --throw npcs to destroy them
+		[0x4d9d] = "Breakable (NPC)", --From stage 38
+		[0x4da1] = "Breakable (NPC)", --From stage 10
 		[0x4e83] = "Water",
 		[0x4ea0] = "Warp",		--From Stage 1
 		[0x4eb3] = "Warp",		--From Stage 5
@@ -119,8 +123,11 @@ local tiles = {
 		[0x4f7f] = "Door",		--From Stage 2
 		[0x4fd3] = "Minigame",	--From Stage 2
 		[0x4ff4] = "Switch",
+		[0x50eb] = "Water",		--OoB, Stage 25
 		[0x50fb] = "Water",
 		[0x510b] = "Water",		--Current
+		[0x5192] = "Spike",		--From stage 38
+		[0x5211] = "Spike",		--From stage 36
 		[0x5374] = "Light"		--Cures zombieism
 	},
 	colors = {
@@ -130,7 +137,7 @@ local tiles = {
 		["Exit"] = "CYAN",
 		["Secret exit"] = "GOLD",
 		["Water"] = "BLUE",
-		["Warp"] = "DIMGRAY",
+		["Warp"] = "YELLOW",
 		["Platform"] = "WHITE",
 		["Platform (NPC)"] = "LIGHTGRAY",
 		["Slideable slope (left)"] = "BROWN",
@@ -139,7 +146,8 @@ local tiles = {
 		["Breakable (NPC)"] = "DEEPPINK",
 		["Breakable (Fire)"] = "DEEPPINK",
 		["Breakable (Food)"] = "DEEPPINK",
-		["Light"] = "LIME"
+		["Light"] = "LIME",
+		["Spike"] ="DARKRED"
 	}
 }
 
@@ -147,14 +155,14 @@ lshift, band, rshift = bit.lshift, bit.band, bit.rshift
 
 function gettile_accurate (wx, wy)
 	-- Not the final location! Can vary if above 0xA000
-	return lshift(band(band(rshift(wy, 4), 0xFF) + 0xA0, 0xFF), 8) + band(rshift(wx, 4), 0xFF)
+	return band(lshift(band(band(rshift(wy, 4), 0xFF) + 0xA0, 0xFF), 8) + band(rshift(wx, 4), 0xFF), 0xFFFF)
 	-- Old comment:
 	-- return (bit.band(0x2000 + 0x100*math.floor(wy/16+1) + math.floor(wx/16), 0x7FFF)) works for most space, not glitch rooms
 end
 
 function gettile_fast (wx, wy)
 	-- The following may not work for glitch rooms:
-	return lshift(band(rshift(wy, 4) + 0xA0, 0xFF), 8) + rshift(wx, 4)
+	return band(lshift(band(rshift(wy, 4) + 0xA0, 0xFF), 8) + rshift(wx, 4), 0xFFFF)
 end
 
 function tileid (ntile)
@@ -185,12 +193,16 @@ function display_npc(base, x, y, camx, camy)
 			local xenemy = memory.read_u16_le(i+5)
 			local yenemy = memory.read_u16_le(i+3)
 			local id = memory.readbyte(i+9)
+			local power = memory.read_u16_be(i+23)
 			local ecamx = (xenemy-x)+camx
 			local ecamy = (yenemy-y)+camy
 			gui.drawBox(ecamx-16, ecamy-32, ecamx, ecamy-16, 0x8611759E)
 			gui.pixelText(ecamx-16, ecamy-39, id)
 			gui.pixelText(ecamx-16, ecamy-32, "X:" .. xenemy)
 			gui.pixelText(ecamx-16, ecamy-25, "Y:" .. xenemy)
+			if id == 156 or id == 160 or id == 180 then
+				gui.pixelText(ecamx-16, ecamy-46, power)
+			end
 		end
 	end
 end
@@ -218,73 +230,80 @@ while true do
 
 	tref = mainmemory.read_u16_be(game_address.tref)
 	stageid = memory.readbyte(game_address.stageid)
-	display_npc(game_address.npc_base, x, y, camx, camy)
-
-	-- warpdest = mainmemory.readbyte(game_address.warpdest) -- sector coordinates for a warp (??)
-	-- 160x144
-	-- gui.drawText(3, 130, string.format("%X", bit.rshift(warpdest, 4)) .. ' ' .. string.format("%X", bit.band(warpdest, 0xF)))
-
-	if (x - camx + 15 + 16 * 17) > 0xFFF or (y - camy + 15 + 16 * 17) > 0xFFF then
-		console.log("Tile coords outside of assumed range: (x: " .. x .. ", camx: " .. camx .. ", y: " .. y .. ", camy: " .. camy .. ")")
-		gettile = gettile_accurate
-		client.pause()
-	else
-		gettile = gettile_fast
-	end
-
-	local curr_tiles, tile_colors = {}, {}
-	local x_offset, y_offset = x - camx - 1, y - camy - 1
-	for i = 0, X_TILES - 1, 1 do
-		for j = 0, Y_TILES - 1, 1 do
-			-- ttype = gettile(x_offset + 16 * i, y_offset + 16 * j)
-			ttype = tileid(gettile(x_offset + 16 * i, y_offset + 16 * j))
-			if (ttype ~= 0x47ab)
-			and (ttype ~= 0x49a7)
-			and not ((ttype >= 0x4e29) and (ttype <= 0x4e39))
-			and not ((ttype >= 0x5400) and (ttype <= 0x54ff)) then
-			--if (ttype~=0x47ab) and (ttype~=0x4cf3) and (ttype~=0x4cef) and (ttype~=0x4d03) and (ttype~=0x4cff) and (ttype~=0x4e29) and (ttype~=0x4e35) and (ttype~=0x4f3a) then
-				curr_tiles[i * X_TILES + j] = game_tiles[ttype]
-				tile_colors[i * X_TILES + j] = tiles.colors[game_tiles[ttype]] or "RED"
-			end
-		end
-	end
-
-	local drawx, drawy
-	for i = 0, X_TILES - 1, 1 do
-		for j = 0, Y_TILES - 1, 1 do
-			tcolor = tile_colors[i * X_TILES + j]
-			if tcolor ~= nil then
-				drawx = (camx - x) % 16 - 24 + 16 * i
-				drawy = (camy - y) % 16 - 32 + 16 * j
-				-- Original drawing method
-				-- gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
-
-				curr_tile = curr_tiles[i * X_TILES + j]
-				if j == 0 or curr_tile ~= curr_tiles[i * X_TILES + (j - 1)] then
-					-- Top
-					gui.drawLine(drawx, drawy, drawx + 15, drawy, tcolor)
-				end
-				if i == X_TILES - 1 or curr_tile ~= curr_tiles[(i + 1) * X_TILES + j] then
-					-- Right
-					gui.drawLine(drawx + 15, drawy, drawx + 15, drawy + 15, tcolor)
-				end
-				if j == Y_TILES - 1 or curr_tile ~= curr_tiles[i * X_TILES + (j + 1)] then
-					-- Bottom
-					gui.drawLine(drawx, drawy + 15, drawx + 15, drawy + 15, tcolor)
-				end
-				if i == 0 or curr_tile ~= curr_tiles[(i - 1) * X_TILES + j] then
-					-- Left
-					gui.drawLine(drawx, drawy, drawx, drawy + 15, tcolor)
-				end
-			end
-		end
-	end
-
+	game_state = memory.readbyte(game_address.game_state)
+	
 	local x_start = 26
+	if game_state == 3 then 
+		display_npc(game_address.npc_base, x, y, camx, camy)
+
+		-- warpdest = mainmemory.readbyte(game_address.warpdest) -- sector coordinates for a warp (??)
+		-- 160x144
+		-- gui.drawText(3, 130, string.format("%X", bit.rshift(warpdest, 4)) .. ' ' .. string.format("%X", bit.band(warpdest, 0xF)))
+
+		if (x - camx + 15 + 16 * 17) > 0xFFF or (y - camy + 15 + 16 * 17) > 0xFFF then
+			gui.pixelText(0, 61, "Tile coords outside of assumed range: (x: " .. x .. ", camx: " .. camx .. ", y: " .. y .. ", camy: " .. camy .. ")")
+			gettile = gettile_accurate
+			-- client.pause()
+		else
+			gettile = gettile_fast
+		end
+
+		local curr_tiles, tile_colors = {}, {}
+		local x_offset, y_offset = x - camx - 1, y - camy - 1
+		for i = 0, X_TILES - 1, 1 do
+			for j = 0, Y_TILES - 1, 1 do
+				-- ttype = gettile(x_offset + 16 * i, y_offset + 16 * j)
+				ttype = tileid(gettile(x_offset + 16 * i, y_offset + 16 * j))
+				if (ttype ~= 0x47ab)
+				and (ttype ~= 0x49a7)
+				and not ((ttype >= 0x4e29) and (ttype <= 0x4e39))
+				and not ((ttype >= 0x5400) and (ttype <= 0x54ff)) then
+				--if (ttype~=0x47ab) and (ttype~=0x4cf3) and (ttype~=0x4cef) and (ttype~=0x4d03) and (ttype~=0x4cff) and (ttype~=0x4e29) and (ttype~=0x4e35) and (ttype~=0x4f3a) then
+					curr_tiles[i * X_TILES + j] = game_tiles[ttype]
+					tile_colors[i * X_TILES + j] = tiles.colors[game_tiles[ttype]] or "RED"
+					if game_tiles[ttype] == "Secret exit" then
+						client.pause()
+					end
+				end
+			end
+		end
+
+		local drawx, drawy
+		for i = 0, X_TILES - 1, 1 do
+			for j = 0, Y_TILES - 1, 1 do
+				tcolor = tile_colors[i * X_TILES + j]
+				if tcolor ~= nil then
+					drawx = (camx - x) % 16 - 24 + 16 * i
+					drawy = (camy - y) % 16 - 32 + 16 * j
+					-- Original drawing method
+					-- gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
+
+					curr_tile = curr_tiles[i * X_TILES + j]
+					if j == 0 or curr_tile ~= curr_tiles[i * X_TILES + (j - 1)] then
+						-- Top
+						gui.drawLine(drawx, drawy, drawx + 15, drawy, tcolor)
+					end
+					if i == X_TILES - 1 or curr_tile ~= curr_tiles[(i + 1) * X_TILES + j] then
+						-- Right
+						gui.drawLine(drawx + 15, drawy, drawx + 15, drawy + 15, tcolor)
+					end
+					if j == Y_TILES - 1 or curr_tile ~= curr_tiles[i * X_TILES + (j + 1)] then
+						-- Bottom
+						gui.drawLine(drawx, drawy + 15, drawx + 15, drawy + 15, tcolor)
+					end
+					if i == 0 or curr_tile ~= curr_tiles[(i - 1) * X_TILES + j] then
+						-- Left
+						gui.drawLine(drawx, drawy, drawx, drawy + 15, tcolor)
+					end
+				end
+			end
+		end
+		
 	gui.pixelText(0, x_start, string.format("%X", gettile(x, y-32)) .. ' ' .. string.format("%X", tileid(gettile(x, y-32))), "WHITE", "BLACK")
 	gui.pixelText(0, x_start + 7, string.format("%X", gettile(x, y-16)) .. ' ' .. string.format("%X", tileid(gettile(x, y-16))), "WHITE", "BLACK")
 	gui.pixelText(0, x_start + 7 * 2, string.format("%X", gettile(x, y)) .. ' ' .. string.format("%X", tileid(gettile(x, y))), "WHITE", "BLACK")
+	end
 	gui.pixelText(0, x_start + 7 * 3, "X:" .. x .. " Y:" .. y, "WHITE", "BLACK")
-	gui.pixelText(0, x_start + 7 * 4, "Stage:" .. stageid, "WHITE", "BLACK")
+	gui.pixelText(0, x_start + 7 * 4, "Stage:" .. stageid.." Game State:" .. game_state, "WHITE", "BLACK")
 	emu.frameadvance()
 end
