@@ -208,6 +208,7 @@ function display_npc(base, x, y, camx, camy)
 end
 
 local X_TILES, Y_TILES = 12, 12
+local text_x = 30
 
 local game_address, game_tiles
 while true do
@@ -232,7 +233,6 @@ while true do
 	stageid = memory.readbyte(game_address.stageid)
 	game_state = memory.readbyte(game_address.game_state)
 	
-	local x_start = 26
 	if game_state == 3 then 
 		display_npc(game_address.npc_base, x, y, camx, camy)
 
@@ -241,9 +241,8 @@ while true do
 		-- gui.drawText(3, 130, string.format("%X", bit.rshift(warpdest, 4)) .. ' ' .. string.format("%X", bit.band(warpdest, 0xF)))
 
 		if (x - camx + 15 + 16 * 17) > 0xFFF or (y - camy + 15 + 16 * 17) > 0xFFF then
-			gui.pixelText(0, 61, "Tile coords outside of assumed range: (x: " .. x .. ", camx: " .. camx .. ", y: " .. y .. ", camy: " .. camy .. ")")
+			gui.pixelText(0, text_x + 7 * 5, "OOB?")
 			gettile = gettile_accurate
-			-- client.pause()
 		else
 			gettile = gettile_fast
 		end
@@ -252,14 +251,13 @@ while true do
 		local x_offset, y_offset = x - camx - 1, y - camy - 1
 		for i = 0, X_TILES - 1, 1 do
 			for j = 0, Y_TILES - 1, 1 do
-				-- ttype = gettile(x_offset + 16 * i, y_offset + 16 * j)
 				ttype = tileid(gettile(x_offset + 16 * i, y_offset + 16 * j))
 				if (ttype ~= 0x47ab)
 				and (ttype ~= 0x49a7)
 				and not ((ttype >= 0x4e29) and (ttype <= 0x4e39))
 				and not ((ttype >= 0x5400) and (ttype <= 0x54ff)) then
 				--if (ttype~=0x47ab) and (ttype~=0x4cf3) and (ttype~=0x4cef) and (ttype~=0x4d03) and (ttype~=0x4cff) and (ttype~=0x4e29) and (ttype~=0x4e35) and (ttype~=0x4f3a) then
-					curr_tiles[i * X_TILES + j] = game_tiles[ttype]
+					curr_tiles[i * X_TILES + j] = ttype
 					tile_colors[i * X_TILES + j] = tiles.colors[game_tiles[ttype]] or "RED"
 					if game_tiles[ttype] == "Secret exit" then
 						client.pause()
@@ -275,9 +273,6 @@ while true do
 				if tcolor ~= nil then
 					drawx = (camx - x) % 16 - 24 + 16 * i
 					drawy = (camy - y) % 16 - 32 + 16 * j
-					-- Original drawing method
-					-- gui.drawBox(drawx, drawy, drawx + 15, drawy + 15, tcolor)
-
 					curr_tile = curr_tiles[i * X_TILES + j]
 					if j == 0 or curr_tile ~= curr_tiles[i * X_TILES + (j - 1)] then
 						-- Top
@@ -299,11 +294,11 @@ while true do
 			end
 		end
 		
-	gui.pixelText(0, x_start, string.format("%X", gettile(x, y-32)) .. ' ' .. string.format("%X", tileid(gettile(x, y-32))), "WHITE", "BLACK")
-	gui.pixelText(0, x_start + 7, string.format("%X", gettile(x, y-16)) .. ' ' .. string.format("%X", tileid(gettile(x, y-16))), "WHITE", "BLACK")
-	gui.pixelText(0, x_start + 7 * 2, string.format("%X", gettile(x, y)) .. ' ' .. string.format("%X", tileid(gettile(x, y))), "WHITE", "BLACK")
+		gui.pixelText(0, text_x, string.format("%X", gettile(x, y-32)) .. ' ' .. string.format("%X", tileid(gettile(x, y-32))))
+		gui.pixelText(0, text_x + 7, string.format("%X", gettile(x, y-16)) .. ' ' .. string.format("%X", tileid(gettile(x, y-16))))
+		gui.pixelText(0, text_x + 7 * 2, string.format("%X", gettile(x, y)) .. ' ' .. string.format("%X", tileid(gettile(x, y))))
 	end
-	gui.pixelText(0, x_start + 7 * 3, "X:" .. x .. " Y:" .. y, "WHITE", "BLACK")
-	gui.pixelText(0, x_start + 7 * 4, "Stage:" .. stageid.." Game State:" .. game_state, "WHITE", "BLACK")
+	gui.pixelText(0, text_x + 7 * 3, "X:" .. x .. " Y:" .. y)
+	gui.pixelText(0, text_x + 7 * 4, "Stage:" .. stageid .. " Game State:" .. game_state)
 	emu.frameadvance()
 end
